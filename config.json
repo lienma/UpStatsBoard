@@ -1,0 +1,77 @@
+{
+	"host": 				"0.0.0.0",
+	"port": 				8024,
+	"webRoot": 				"",
+	"debugStopUpdating": 	false,
+	"logHttpRequests": 		true,
+
+	"drives": {
+		"Label":{
+			"remote": 		false,
+			"location": 	"/",
+
+			// Required if a remote drive
+			"host": 		"",
+			"port": 		22,
+			"username": 	"",
+			"password": 	"",
+
+			// Optional
+			total: 10,
+
+			// Optional
+			icon: ''
+		}
+	},
+
+	"bandwidthServers": {
+		"Label": {
+			"default": 	true,
+			//          [Download, Upload]
+			"maxSpeed": [100, 100],
+			"remote": 	false,
+
+			// Required if remote server
+			"host": 	"",
+			"port": 	22,
+			"username": "",
+			"password": "",
+
+		}
+	},
+
+	"services": {
+		"PolarBear": {
+			"host": "",
+			"port": 80,
+
+			// Optional
+			"url": ""
+		}
+	},
+
+	"sickbeard": {
+		"protocol": "http://",
+		"host": 	"",
+		"port": 	8081,
+		"webRoot": 	"/tv",
+		"apiKey": 	""
+	},
+
+	"plex": {
+		"protocol": 			"http://",
+		"host": 				"",
+		"port": 				32400,
+		"username": 			"",
+		"password": 			"",
+		"recentTVSection": 		2,
+		"recentMovieSection": 	1
+	},
+
+	// Forecast.io
+	"weather": {
+		"apiKey": 	"",
+		"lat": 		"",
+		"long": 	""
+	}
+}
