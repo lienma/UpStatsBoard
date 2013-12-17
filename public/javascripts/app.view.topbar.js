@@ -1,0 +1,118 @@
+!(function(App, $, _, Backbone, Skycons) {
+
+
+	var TopBar =  Backbone.View.extend({
+		el: '.top-display-bar',
+
+		initialize: function() {
+			this.clock = new Clock({el: this.$('.clock-container')});
+
+			if(App.Config.weatherEnabled) {
+				this.weather = new Weather({el: this.$('.weather-container')});
+			}
+		}
+	});
+
+	var Clock = Backbone.View.extend({
+
+		initialize: function() {
+			var self = this;
+
+			this.clock = this.$('.clock');
+
+			this.update();
+			setInterval(function() { self.update(); }, 30000);
+		},
+
+		update: function() {
+			var m = moment();
+			this.clock.tooltip({
+				placement: 'left',
+				title: m.format('dddd, MMMM D, YYYY')
+			});
+
+			this.clock.find('.time').html(m.format('h:mm'));
+			this.clock.find('.ampm').html(m.format('A'));
+		}
+	});
+
+	var WeatherModel = Backbone.Model.extend({
+		url: App.Config.WebRoot + '/stats/weather'
+	});
+
+	var Weather = Backbone.View.extend({
+		popoverOpened: false,
+
+		initialize: function() {
+			var self = this;
+
+			this.text = this.$('.tempature');
+			this.textColor = this.text.css('color');
+			this.textTitle = this.text.data('tooltip-title');
+			this.textTooltip = { placement: 'left', title: this.textTitle};
+			this.text.tooltip(this.textTooltip);
+			this.text.popover({
+				placement: 'bottom', html: true,
+				content: $('#tmpl-weather-popover').html()
+			});
+
+			this.weather = new WeatherModel();
+			this.weather.on('change', function(model) {
+				if(self.popoverOpened) {
+					self.updatePopover();
+				}
+			});
+
+			$(document).click(function(event) {
+				if(self.popoverOpened) {
+					var parents = $(event.target).parents();
+					if(parents.index(self.$el) == -1) {
+						self.text.popover('hide');
+					}
+				}
+			});
+
+			this.weather.on('change:currentTemp', function(model) {
+				self.text.html(model.get('currentTemp') + '&deg;');
+			});
+
+			this.text.on('shown.bs.popover', function() {
+				self.popoverOpened = true;
+				self.updatePopover(true);
+				self.text.css({color: $('body').css('color')});
+				self.text.tooltip('destroy');
+			});
+
+			this.text.on('hide.bs.popover', function() {
+				self.popoverOpened = false;
+				self.skycons.remove('weatherIcon');
+				self.text.animate({color: self.textColor});
+				self.text.tooltip(self.textTooltip);
+			});
+
+			this.weather.fetch();
+			setInterval(function() {
+				if(!App.Config.StopUpdating) {
+					self.weather.fetch();
+				}
+			}, 300000);
+
+			this.skycons = new Skycons({'color': '#333333'});
+		},
+
+		updatePopover: function(opening) {
+			var model = this.weather
+			  , popover = this.$('.popover');
+
+			this.skycons[(opening) ? 'add' : 'set']('weatherIcon', model.get('currentIcon'));
+			this.skycons.play();
+
+			popover.find('.tempature').html(model.get('currentTemp') + '&deg;');
+			popover.find('.detail').html(model.get('currentSummary'));
+			popover.find('.next-hour').html(model.get('minutelySummary'));
+			popover.find('.next-24').html(model.get('hourlySummary'));
+		}
+	});
+
+	App.View.TopBar = TopBar;
+})(App, jQuery, _, Backbone, Skycons);

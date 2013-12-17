@@ -1,0 +1,25 @@
+{
+  "name": "StatusApp",
+  "description": "Status app for a usenet and plex.",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": 			"3.4.3",
+    "jade": 			"*",
+    "stylus": 			"*",
+    "nib": 				"*",
+
+	"async": 			"*",
+	"ssh2": 			"*",
+	"moment": 			"*",
+	"request": 			"*",
+	"xml2js": 			"*",
+	"express-uglify": 	"*",
+	"os-utils": 		"*",
+	"when": 			"*",
+	"underscore": 		"*"
+  }
+}
