@@ -29,13 +29,10 @@ SickBeard.prototype.getBaseUrl = function() {
 	return this.protocol + this.host + ':' + this.port + this.webRoot;
 };
 
-SickBeard.prototype.getPage = function(cmd, filters, callback) {
+SickBeard.prototype.getPage = function(cmd, filters) {
+	var promise = when.defer();
 
-	if(typeof filters == 'function') {
-		var callback = filters;
-		filters = '';
-	}
-
+	var filters = (filters) ? filters : '';
 	var url = this.url + '/api/' + this.apiKey + '/?cmd=' + cmd + '&' + filters;
 
 	request({
@@ -43,38 +40,61 @@ SickBeard.prototype.getPage = function(cmd, filters, callback) {
 		json: true,
 		timeout: 10000
 	}, function(err, res, body) {
-		if(err) return callback(err);
-
-		if(body && body.result == 'success') {
-			callback(null, body.data);
+		if(err) {
+			var errReject = new Error('REQUEST');
+			errReject.detail = err;
+			return promise.reject(errReject);
 		}
+
+		if(body) {
+			if(body.result == 'success') {
+				return promise.resolve(body.data);
+			}
+
+			var err = new Error((body.result == 'denied') ? 'DENIED' : 'FAILED');
+			err.detail = body.message;
+
+			if(body.result == 'denied') {
+				err.reason = 'The api key for Sick Beard is wrong';
+			}
+			return promise.reject(err);
+		}
+
+		var err = new Error('WRONG_SETTINGS');
+		err.reason = 'Something wrong with the Sick Beard settings.';
+		promise.reject(err);
 	});
+
+	return promise.promise;
 };
 
 SickBeard.prototype.getShowsStats = function(callback) {
-	this.getPage('shows.stats', function(err, data) {
-		if(err) return callback(err);
-
-
-		callback(null, data);
-	});
+	var promise = when.defer();
+	this.getPage('shows.stats').then(promise.resolve).otherwise(promise.reject);
+	return promise.promise;
 };
 
-SickBeard.prototype.getPoster = function(showId, callback) {
+SickBeard.prototype.getPoster = function(showId) {
+	var promise = when.defer();
+	
 	var url = this.url + '/api/' + this.apiKey + '/?cmd=show.getposter&tvdbid=' + showId;
 	request({uri: url, timeout: 10000, encoding: null}, function(err, res, body) {
 		if (!err && res.statusCode == 200) {
-			callback(null, body);
+			promise.resolve(body);
 		} else {
-			callback(err);
+			promise.reject(err);
 		}
 	});
+
+	return promise.promise;
 };
 
-SickBeard.prototype.getUpComingShows = function(callback) {
-	this.getPage('future', 'sort=date&type=missed|today|soon|later', function(err, data) {
-		if(err) return callback(err);
+SickBeard.prototype.getUpComingShows = function(type) {
+	var promise = when.defer();
 
+	var type = (type) ? type : 'missed|today|soon|later';
+
+	this.getPage('future', 'sort=date&type=' + type).then(function(data) {
 		var json = [];
 		if(data.missed)
 			for(var i = 0; i < data.missed.length; i++)
@@ -94,29 +114,17 @@ SickBeard.prototype.getUpComingShows = function(callback) {
 
 //console.log(data.today);
 
-		callback(null, json);
-	});
+		promise.resolve(json);
+	}).otherwise(promise.reject);
+
+	return promise.promise;
 };
 
 SickBeard.prototype.ping = function() {
 	var promise = when.defer();
-
-	request({
-		uri: this.url + '/api/' + this.apiKey + '/?cmd=sb.ping',
-		json: true,
-		timeout: 5000
-	}, function(err, res, body) {
-		if(err || !body) return promise.reject(new Error('Failed to ping sickbeard'));
-
-		if(body.result == 'denied') {
-			return promise.reject(new Error('Wrong api key for sickbeard'));
-		}
-
-		if(body.result == 'success') {
-			promise.resolve(true);
-		}
-	});
-
+	this.getPage('sb.ping').then(function() {
+		promise.resolve();
+	}).otherwise(promise.reject);
 	return promise.promise;
 };
 

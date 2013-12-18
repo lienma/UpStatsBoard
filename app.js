@@ -95,5 +95,11 @@ config().then(function(conf) {
 		console.log('StatusBoard'.yellow, 'is running at',  uri.cyan);
 	});
 }).otherwise(function(reason) {
-	console.log('Error has occurred when trying to validate configuration data:'.red, reason.message);
+	var msg = reason;
+console.log('instance:', reason instanceof Error);
+	if(reason instanceof Error) {
+		msg = reason.message;
+	}
+
+	console.log('Error occurred while validating config data:'.red, msg);
 });

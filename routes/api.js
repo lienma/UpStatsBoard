@@ -57,30 +57,31 @@ var api = {
 	sickbeard: {
 		poster: function(req, res) {
 			var sb = req.app.config.sickbeard;
-			sb.getPoster(req.param('showId'), function(err, image) {
+			sb.getPoster(req.param('showId')).then(function(image) {
 				res.type('jpeg');
 				res.send(image);
+			}).otherwise(function(reason) {
+// Error image..
 			});
 		},
 		upcoming: function(req, res) {
 			var sb = req.app.config.sickbeard;
-			sb.getUpComingShows(function(err, shows) {
+			sb.getUpComingShows().then(function(shows) {
 				res.json(shows);
+			}).otherwise(function(reason) {
+// Show some error?
 			});
 		},
 		showsStats: function(req, res) {
 			var sb = req.app.config.sickbeard;
-			sb.getShowsStats(function(err, stats) {
-				if(err) {
-					res.json({});
-				} else {
-					var json = {
-						percentComplete: Math.round(stats.ep_downloaded / stats.ep_total * 10000) / 100,
-						showsActive: stats.shows_active,
-						showsTotal: stats.shows_total
-					};
-					res.json(json);
-				}
+			sb.getShowsStats().then(function(stats) {
+				res.json({
+					percentComplete: Math.round(stats.ep_downloaded / stats.ep_total * 10000) / 100,
+					showsActive: stats.shows_active,
+					showsTotal: stats.shows_total
+				});
+			}).otherwise(function(reason) {
+// Show some error?
 			});
 		}
 	}

@@ -217,7 +217,11 @@ function validateSickbeard(data) {
 		data.config.sickbeard = sickbeard;
 		promise.resolve(data);
 
-	}).otherwise(promise.reject);
+	}).otherwise(function(reason) {
+		if(reason.message == 'DENIED' || reason.message == 'WRONG_SETTINGS') {
+			promise.reject(reason.reason);
+		}
+	});
 
 	var sickbeardCacheFolder = path.join(cachePath, 'sickbeard');
 	var cacheFolderExists = fs.existsSync(sickbeardCacheFolder);
