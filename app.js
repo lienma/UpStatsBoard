@@ -10,9 +10,9 @@ var express 		= require('express')
   , async 			= require('async')
   , expressUglify 	= require('express-uglify');
 
-var api 		= require('./routes/api')
+var api 		= require(path.join(__dirname, 'routes', 'api'))
   , routes 		= require('./routes')
-  , stats 		= require('./routes/stats')
+  , stats 		= require(path.join(__dirname, 'routes', 'stats'))
   , config 		= require('./libs/Config');
 
 var publicPath 	= path.join(__dirname, 'public')

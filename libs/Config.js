@@ -1,5 +1,7 @@
 var when    	= require('when')
-  , _    		= require('underscore');
+  , _    		= require('underscore')
+  , fs 			= require('fs')
+  , path 		= require('path');
 
 var Bandwidth 	= require('./../libs/Bandwidth')
   , Disk 		= require('./../libs/Disk')
@@ -7,6 +9,9 @@ var Bandwidth 	= require('./../libs/Bandwidth')
   , Service 	= require('./../libs/Service')
   , Plex 		= require('./../libs/Plex')
   , SickBeard 	= require('./../libs/SickBeard');
+
+var appRoot 	= path.resolve(__dirname, '../')
+  , cachePath 	= path.resolve(appRoot, 'cache');
 
 function Config() {
 	var promise = when.defer();
@@ -31,9 +36,22 @@ function Config() {
 	return promise.promise;
 }
 
+function getPaths() {
+	return {
+		'appRoot': appRoot,
+		'cache': cachePath
+	};
+}
+
 function getConfigData() {
-	var configData = require('./../config.json');
-	return when.resolve({data: configData, config: { }});
+	
+	var data = require(path.join(appRoot, 'config.js'));
+
+	var config = {
+		paths: getPaths
+	};
+
+	return when.resolve({data: data, config: config});
 }
 
 function validateSiteSettings(data) {
@@ -43,6 +61,11 @@ function validateSiteSettings(data) {
 
 	data.config.debugStopUpdating = (data.data.debugStopUpdating) ? true : false;
 	data.config.logHttpRequests = (data.data.logHttpRequests) ? true : false;
+
+	var cacheFolderExists = fs.existsSync(cachePath);
+	if(!cacheFolderExists) {
+		fs.mkdirSync(cachePath);
+	}
 
 	return when.resolve(data);
 }
@@ -196,11 +219,16 @@ function validateSickbeard(data) {
 
 	}).otherwise(promise.reject);
 
+	var sickbeardCacheFolder = path.join(cachePath, 'sickbeard');
+	var cacheFolderExists = fs.existsSync(sickbeardCacheFolder);
+	if(!cacheFolderExists) {
+		fs.mkdirSync(sickbeardCacheFolder);
+	}
+
 	return promise.promise;
 }
 
 function validatePlex(data) {
-//new Plex(configData.plex);
 	var promise = when.defer()
 	  , plexData = data.data.plex;
 
@@ -237,6 +265,12 @@ function validatePlex(data) {
 		data.config.plex = plex;
 		promise.resolve(data);
 	}).otherwise(promise.reject);
+
+	var plexCacheFolder = path.join(cachePath, 'plex');
+	var cacheFolderExists = fs.existsSync(plexCacheFolder);
+	if(!cacheFolderExists) {
+		fs.mkdirSync(plexCacheFolder);
+	}
 
 	return promise.promise;
 }
