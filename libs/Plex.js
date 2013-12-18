@@ -23,7 +23,7 @@ Plex.prototype.getMyPlexToken = function() {
 	  , self = this;
 
 	request.post('https://my.plexapp.com/users/sign_in.xml', {
-		headers: { 'X-Plex-Client-Identifier': 'Status Board @ ' + os.hostname() }
+		headers: { 'X-Plex-Client-Identifier': 'UpStats Board @ ' + os.hostname() }
 	}, function(err, res, body) {
 		if(err) return promise.reject(err);
 
@@ -49,8 +49,10 @@ Plex.prototype.getMyPlexToken = function() {
 	return promise.promise;
 };
 
-Plex.prototype.getPageNew = function(url, options) {
-	var promise = when.defer();
+Plex.prototype.getPage = function(url, options) {
+	var self = this
+	  , promise = when.defer()
+	  , tokenCount = 0;
 
 	var urlOptions = '';
 	if(typeof options === 'object') {
@@ -60,13 +62,13 @@ Plex.prototype.getPageNew = function(url, options) {
 		}	
 	}
 
-	request({
+	var resOptions = {
 		uri: this.url + url,
-		headers: {
-			'X-Plex-Token': this.token
-		},
+		headers: { 'X-Plex-Token': this.token },
 		encoding: null
-	}, function(err, res, body) {
+	};
+
+	function callback(err, res, body) {
 		if(err) {
 			var errReject = new Error('REQUEST');
 			errReject.detail = err;
@@ -74,15 +76,31 @@ Plex.prototype.getPageNew = function(url, options) {
 		}
 
 		if(res.statusCode == 401) {
-			var err = new Err('UNAUTHORIZED');
-			return promise.reject(err);
+			if(tokenCount == 1) {
+				var err = new Err('UNAUTHORIZED');
+				err.reason = 'Plex token bad?';
+				return promise.reject(err);
+			} else {
+				self.getMyPlexToken().then(function() {
+					tokenCount += 1;
+					request(resOptions, callback);
+
+				}).otherwise(function(reason) {
+					var err = new Err('UNAUTHORIZED');
+					err.reason = reason;
+					return promise.reject(err);
+				});
+			}
 		}
 
-	});
+		promise.resolve(body);
+	}
+
+	request(resOptions, callback);
 	return promise.promise;
 };
 
-Plex.prototype.getPage = function(url, options, callback) {
+Plex.prototype.getPageOld = function(url, options, callback) {
 	if(typeof options === 'function')
       var callback = options;
 
@@ -111,9 +129,8 @@ Plex.prototype.getPage = function(url, options, callback) {
 };
 
 Plex.prototype.getXml = function(url, callback) {
-	this.getPage(url, function(err, body) {
-		if(err) return callback(err);
-
+	this.getPage(url).then(function(body) {
+console.log('body:', body);
 		body = (new String(body)).trim();
 		if(body.substr(0, 5) != '<?xml') { //>
 			var err = new Error('not xml');
@@ -130,6 +147,8 @@ Plex.prototype.getXml = function(url, callback) {
 
 			callback(null, data);
 		});
+	}).otherwise(function(reason) {
+		callback(reason);
 	});
 };
 
