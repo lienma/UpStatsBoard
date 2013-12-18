@@ -264,11 +264,37 @@ function validatePlex(data) {
 
 	var plex = new Plex(options);
 
-	console.log('Getting token for plex.'.grey);
-	plex.getMyPlexToken().then(function() {
-		data.config.plex = plex;
-		promise.resolve(data);
-	}).otherwise(promise.reject);
+	function vaidateSection(sectionId, type, err) {
+		var promise = when.defer();
+
+		plex.getSectionType(sectionId).then(function(sectionType) {
+			if(sectionType == type) {
+				promise.resolve();
+			} else {
+				promise.reject(err);
+			}
+		}).otherwise(promise.reject);	
+
+		return promise.promise;
+	}
+
+	console.log('Getting token for myPlex.'.grey);
+	plex.getMyPlexToken()
+		.then(plex.ping.bind(plex))
+		.then(function() {
+			var err = new Error('WRONG_TV_SECTION_ID');
+			err.reason = 'The TV section ID is not a tv section.';
+			return vaidateSection(options.recentTVSection, 'show', err);
+		})
+		.then(function() {
+			var err = new Error('WRONG_MOVIE_SECTION_ID');
+			err.reason = 'The Movie section ID is not a movie section.';
+			return vaidateSection(options.recentMovieSection, 'movie', err);
+		})
+		.then(function() {
+			data.config.plex = plex;
+			promise.resolve(data);
+		}).otherwise(promise.reject);
 
 	var plexCacheFolder = path.join(cachePath, 'plex');
 	var cacheFolderExists = fs.existsSync(plexCacheFolder);

@@ -28,7 +28,7 @@ Plex.prototype.getMyPlexToken = function() {
 		if(err) return promise.reject(err);
 
 		if(body.substr(0, 5) != '<?xml') { //>
-			var err = new Error('Error gettin plex token; Response not xml format.')
+			var err = new Error('Error gettin plex token; Response not xml format.');
 			if(typeof body === 'string') {
 				err.details = body
 			}
@@ -68,6 +68,10 @@ Plex.prototype.getPage = function(url, options, callback) {
 		encoding: null
 	}, function(err, res, body) {
 		if(err) return callback(err);
+
+		if(res.statusCode == 401) {
+			return callback('UNAUTHORIZED');
+		}
 		callback(null, body);
 	});
 };
@@ -78,7 +82,8 @@ Plex.prototype.getXml = function(url, callback) {
 
 		body = (new String(body)).trim();
 		if(body.substr(0, 5) != '<?xml') { //>
-			var err = new Error('not xml')
+			var err = new Error('not xml');
+			err.url = url;
 			if(typeof body === 'string') {
 				err.details = body
 			}
@@ -237,8 +242,11 @@ Plex.prototype.getRecentlyAired = function(sectionId, unwatched, start, size, ca
 		callback('Invalid Options');
 	}
 	var urlUnwatched = (unwatched) ? '&unwatched=1' : '';
+	var url ='/library/sections/' + sectionId + '/all?type=4' + urlUnwatched + '&sort=originallyAvailableAt:desc&X-Plex-Container-Start=' + start + '&X-Plex-Container-Size=' + size;
+console.log(url);
 
-	this.getXml('/library/sections/' + sectionId + '/all?type=4' + urlUnwatched + '&sort=originallyAvailableAt:desc&X-Plex-Container-Start=' + start + '&X-Plex-Container-Size=' + size, function(err, data) {
+	this.getXml(url, function(err, data) {
+console.log(data);
 		if(err) return callback(err);
 
 		var videos = [];
@@ -269,6 +277,39 @@ Plex.prototype.getRecentlyAired = function(sectionId, unwatched, start, size, ca
 		}
 		callback(null, videos);
 	});
+};
+
+Plex.prototype.getSectionType = function(sectionId) {
+	var promise = when.defer();
+
+	var url = '/library/sections/' + sectionId + '/all?X-Plex-Container-Size=1&X-Plex-Container-Start=0';
+	this.getXml(url, function(err, data) {
+		if(err) return promise.reject(err)
+
+		if(data.MediaContainer) {
+			return promise.resolve(data.MediaContainer.viewGroup);
+		}
+
+		promise.reject(err);
+	});
+
+	return promise.promise;
+};
+
+Plex.prototype.ping = function() {
+	var promise = when.defer();
+
+	this.getXml('/status', function(err, data) {
+		if(err) return promise.reject(err);
+
+		if(data.MediaContainer) return promise.resolve();
+
+		var err = new Error('WRONG_SETTINGS');
+		err.reason = 'Something wrong with the Plex settings.';
+		promise.reject(err);
+	});
+
+	return promise.promise;
 };
 
 exports = module.exports = Plex;
