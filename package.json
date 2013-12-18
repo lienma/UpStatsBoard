@@ -1,6 +1,6 @@
 {
-  "name": "StatusApp",
-  "description": "Status app for a usenet and plex.",
+  "name": "UpStats Board",
+  "description": "Usenet + plex + Stats Board, allows you to monitor your usenet services (SABnzbd+, Sick Beard, & CouchPotato), Plex, & your system (CPU Usage, Memory Usage, Bandwidth Usage, & Disk Space Usage)",
   "version": "0.0.1",
   "private": true,
   "scripts": {
