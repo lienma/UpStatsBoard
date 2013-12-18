@@ -1,10 +1,18 @@
 # [UpStats Board](https://github.com/lienma/UpStatsBoard)
 
-**U**senet + **p**lex + **Stats** Board, allows you to monitor your usenet services (**SABnzbd+**, **SickBeard**, & **CouchPotato**), **Plex**, & your system (CPU Usage, Memory Usage, Bandwidth Usage, & Disk Space Usage).
+**U**senet + **p**lex + **Stats** Board, allows you to monitor your usenet services (**SABnzbd+**, **Sick Beard**, & **CouchPotato**), **Plex**, & your system (CPU Usage, Memory Usage, Bandwidth Usage, & Disk Space Usage).
 
 Ups Status Board is powered by [Node.js](http://www.nodejs.org/), [Express](http://www.expressjs.com/), [Bootstrap](http://www.getbootstrap.com/), [Backbone](http://www.backbonejs.org/), [jQuery](http://www.jquery.com/?), [Flot](www.flotcharts.org/), and plenty of other libraries.
 
+## This is a work in progress. Not a lot of features have not been implemented yet.
+
 ### Requirements
+*  Ubuntu(As of right now)
+*  [Node.js](http://www.nodejs.org/)
+*  [vnStat](http://humdi.net/vnstat/)
+*  [Plex Media Server](http://plexapp.com/)
+*  [Sick Beard](http://sickbeard.com/)
+
 
 ## Getting Started
 ### How to Install Node.JS

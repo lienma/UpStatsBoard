@@ -51,11 +51,13 @@ config().then(function(conf) {
 			app.use(express.logger());
 		}
 
-		app.use(app.config.webRoot, expressUglify.middleware({ src: publicPath, logger: function() {
+		function blankLog() {
 			this.log = function() {
 
 			};
-		} }));
+		}
+
+		app.use(app.config.webRoot, expressUglify.middleware({ src: publicPath, logger: new blankLog() }));
 
 		var oneYear = 31557600000;
 		app.use(app.config.webRoot, express.static(publicPath, { maxAge: oneYear }));
