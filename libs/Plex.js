@@ -40,11 +40,45 @@ Plex.prototype.getMyPlexToken = function() {
 			if(err) return promise.reject(err);
 
 			if(data.errors) return promise.reject(new Error('Plex Error: ' + data.errors.error[0]));
+
 			self.token = data.user.authenticationToken;
 			promise.resolve();
 		});
 	}).auth(this.username, this.password);
 
+	return promise.promise;
+};
+
+Plex.prototype.getPageNew = function(url, options) {
+	var promise = when.defer();
+
+	var urlOptions = '';
+	if(typeof options === 'object') {
+		for(x in options) {
+			url += (url.indexOf('?') == -1) ? '?' : '&';
+			url += x + '=' + options[x];
+		}	
+	}
+
+	request({
+		uri: this.url + url,
+		headers: {
+			'X-Plex-Token': this.token
+		},
+		encoding: null
+	}, function(err, res, body) {
+		if(err) {
+			var errReject = new Error('REQUEST');
+			errReject.detail = err;
+			return promise.reject(errReject);
+		}
+
+		if(res.statusCode == 401) {
+			var err = new Err('UNAUTHORIZED');
+			return promise.reject(err);
+		}
+
+	});
 	return promise.promise;
 };
 

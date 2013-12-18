@@ -280,12 +280,15 @@ function validatePlex(data) {
 
 	console.log('Getting token for myPlex.'.grey);
 	plex.getMyPlexToken()
+.then(function() { console.log('Sending ping to plex'); })
 		.then(plex.ping.bind(plex))
+.then(function() { console.log('Checking tv section id'); })
 		.then(function() {
 			var err = new Error('WRONG_TV_SECTION_ID');
 			err.reason = 'The TV section ID is not a tv section.';
 			return vaidateSection(options.recentTVSection, 'show', err);
 		})
+.then(function() { console.log('Checking movie section id'); })
 		.then(function() {
 			var err = new Error('WRONG_MOVIE_SECTION_ID');
 			err.reason = 'The Movie section ID is not a movie section.';
