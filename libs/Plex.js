@@ -130,8 +130,9 @@ Plex.prototype.getPageOld = function(url, options, callback) {
 
 Plex.prototype.getXml = function(url, callback) {
 	this.getPage(url).then(function(body) {
-console.log('body:', body);
-		body = (new String(body)).trim();
+		body = body.toString('utf-8');
+console.log(body);
+		body = body.trim();
 		if(body.substr(0, 5) != '<?xml') { //>
 			var err = new Error('not xml');
 			err.url = url;
