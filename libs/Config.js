@@ -57,7 +57,7 @@ function getConfigData() {
 function validateSiteSettings(data) {
 	data.config.host 	= (data.data.host) ? data.data.host : '0.0.0.0';
 	data.config.port	= (data.data.port) ? data.data.port : 8084;
-	data.config.webRoot = (data.data.webRoot) ? data.data.webRoot : '';
+	data.config.webRoot = (data.data.webRoot || data.data.webRoot != '/') ? data.data.webRoot : '';
 
 	data.config.debugStopUpdating = (data.data.debugStopUpdating) ? true : false;
 	data.config.logHttpRequests = (data.data.logHttpRequests) ? true : false;
