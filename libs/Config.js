@@ -259,9 +259,8 @@ function validatePlex(data) {
 	if(_.isString(plexData.url)) {
 		options.url = plexData.url;
 	} else {
-		options.url = options.protocol + options.host + ':' + options.port + '/' + options.webRoot;
+		options.url = options.protocol + options.host + ':' + options.port;
 	}
-
 	var plex = new Plex(options);
 
 	function vaidateSection(sectionId, type, err) {
@@ -280,15 +279,15 @@ function validatePlex(data) {
 
 	console.log('Getting token for myPlex.'.grey);
 	plex.getMyPlexToken()
-.then(function() { console.log('Sending ping to plex'); })
+//.then(function() { console.log('Sending ping to plex'); })
 		.then(plex.ping.bind(plex))
-.then(function() { console.log('Checking tv section id'); })
+//.then(function() { console.log('Checking tv section id'); })
 		.then(function() {
 			var err = new Error('WRONG_TV_SECTION_ID');
 			err.reason = 'The TV section ID is not a tv section.';
 			return vaidateSection(options.recentTVSection, 'show', err);
 		})
-.then(function() { console.log('Checking movie section id'); })
+//.then(function() { console.log('Checking movie section id'); })
 		.then(function() {
 			var err = new Error('WRONG_MOVIE_SECTION_ID');
 			err.reason = 'The Movie section ID is not a movie section.';
