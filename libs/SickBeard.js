@@ -75,14 +75,48 @@ SickBeard.prototype.getShowsStats = function(callback) {
 };
 
 SickBeard.prototype.getPoster = function(showId) {
-	var promise = when.defer();
+	var promise = when.defer()
+	  , fs = require('fs')
+	  , moment = require('moment');
+	var self = this
 	
 	var url = this.url + '/api/' + this.apiKey + '/?cmd=show.getposter&tvdbid=' + showId;
-	request({uri: url, timeout: 10000, encoding: null}, function(err, res, body) {
-		if (!err && res.statusCode == 200) {
-			promise.resolve(body);
+	var file = './cache/sickbeard/poster-' + showId;
+
+	function getImage(dontWriteImage) {
+		request({uri: url, timeout: 10000, encoding: null}, function(err, res, body) {
+			if (!err && res.statusCode == 200) {
+				if(!dontWriteImage) {
+					fs.writeFile(file, body, function(err) {
+
+					});
+				}
+
+				promise.resolve(body);
+			} else {
+				promise.reject(err);
+			}
+		});
+	}
+
+	fs.exists(file, function(exists) {
+		if(exists) {
+			fs.stat(file, function(err, stats) {
+				if(err)	return getImage(true);
+
+				var imgCreated = moment(stats.mtime);
+				if(imgCreated.isBefore(imgCreated.subtract('days', 7))) {
+					getImage();
+				} else {
+					fs.readFile(file, function(err, image) {
+						if(err) return getImage(true);
+
+						promise.resolve(image);
+					});
+				}
+			});
 		} else {
-			promise.reject(err);
+			getImage();
 		}
 	});
 

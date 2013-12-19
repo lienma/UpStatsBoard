@@ -7,7 +7,7 @@ Ups Status Board is powered by [Node.js](http://www.nodejs.org/), [Express](http
 ## This is a work in progress. Not a lot of features have not been implemented yet.
 
 ### Requirements
-*  Ubuntu(As of right now)
+*  Ubuntu and CentOS (As of right now)
 *  [Node.js](http://www.nodejs.org/)
 *  [vnStat](http://humdi.net/vnstat/)
 *  [Plex Media Server](http://plexapp.com/)

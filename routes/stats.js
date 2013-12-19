@@ -159,7 +159,8 @@ exports.services = function(req, res) {
 exports.weather = function(req, res) {
 	var config = req.app.config.weather;
 
-	var forecastExcludes = '?exclude=daily,flags';
+	
+	var forecastExcludes = '?exclude=daily,flags' + (config.useFahrenheit) ? '' : '&units=si';
 	var url = 'https://api.forecast.io/forecast/' + config.apiKey;
 		url += '/' + config.lat + ',' + config.long + forecastExcludes;
 

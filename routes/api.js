@@ -3,28 +3,27 @@ var api = {
 	plex: {
 		currentlyWatching: function(req, res) {
 			var plex = req.app.config.plex;
-			plex.getCurrentlyWatching(function(err, videos) {
+			plex.getCurrentlyWatching().then(function(videos) {
 				var json = [];
-				if(err) {
-// Log the err
-				} else {
-					videos.forEach(function(video) {
-						json.push({
-							_id: video.sessionKey,
-							art: video.art,
-							title: video.title,
-							titleSort: video.titleSort,
-							thumb: video.thumb,
-							tvShowTitle: video.tvShowTitle,
-							tvShowThumb: video.tvShowThumb,
-							year: video.year,
-							duration: video.duration,
-							summary: video.summary,
-							type: video.type,
-						});
+
+				videos.forEach(function(video) {
+					json.push({
+						_id: video.sessionKey,
+						art: video.art,
+						title: video.title,
+						titleSort: video.titleSort,
+						thumb: video.thumb,
+						tvShowTitle: video.tvShowTitle,
+						tvShowThumb: video.tvShowThumb,
+						year: video.year,
+						duration: video.duration,
+						summary: video.summary,
+						type: video.type,
 					});
-				}
+				});
 				res.json(json);
+			}).otherwise(function(reason) {
+// Show some error?
 			});
 		},
 		poster: function(req, res) {
@@ -33,23 +32,29 @@ var api = {
 				location: req.param('location'),
 				width: req.param('width'),
 				height: req.param('height')
-			}, function(err, image) {
+			}).then(function(image) {
 				res.type('jpeg');
 				res.send(image);
+			}).otherwise(function(reason) {
+// Show some error?
 			});
 		},
 		recentlyAddedMovies: function(req, res) {
 			var plex = req.app.config.plex;
-			plex.getRecentlyAdded(plex.recentMovieSection, 0, 20, function(err, videos) {
+			plex.getRecentlyAdded(plex.recentMovieSection, 0, 20).then(function(videos) {
 				res.json(videos);
+			}).otherwise(function(reason) {
+// Show some error?
 			});
 		},
 		recentlyAired: function(req, res) {
 			var plex = req.app.config.plex;
 			var unwatched = (req.param('unwatched') == 'true') ? true : false;
 
-			plex.getRecentlyAired(plex.recentTVSection, unwatched, 0, 20, function(err, videos) {
+			plex.getRecentlyAired(plex.recentTVSection, unwatched, 0, 20).then(function(videos) {
 				res.json(videos);
+			}).otherwise(function(reason) {
+// Show some error?
 			});
 		}
 	},

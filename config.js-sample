@@ -72,6 +72,7 @@ module.exports = {
 	"weather": {
 		"apiKey": 	"",
 		"lat": 		"",
-		"long": 	""
+		"long": 	"",
+		"useFahrenheit": true
 	}
 };

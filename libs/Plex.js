@@ -100,65 +100,46 @@ Plex.prototype.getPage = function(url, options) {
 	return promise.promise;
 };
 
-Plex.prototype.getPageOld = function(url, options, callback) {
-	if(typeof options === 'function')
-      var callback = options;
+Plex.prototype.getXml = function(url) {
+	var promise = when.defer();
 
-	var urlOptions = '';
-	if(typeof options === 'object') {
-		for(x in options) {
-			url += (url.indexOf('?') == -1) ? '?' : '&';
-			url += x + '=' + options[x];
-		}	
-	}
-
-	request({
-		uri: this.url + url,
-		headers: {
-			'X-Plex-Token': this.token
-		},
-		encoding: null
-	}, function(err, res, body) {
-		if(err) return callback(err);
-
-		if(res.statusCode == 401) {
-			return callback('UNAUTHORIZED');
-		}
-		callback(null, body);
-	});
-};
-
-Plex.prototype.getXml = function(url, callback) {
 	this.getPage(url).then(function(body) {
-		body = body.toString('utf-8');
-		body = body.trim();
+		body = (body.toString('utf-8')).trim();
+
 		if(body.substr(0, 5) != '<?xml') { //>
-			var err = new Error('not xml');
+			var err = new Error('NOT_XML');
 			err.url = url;
 			if(typeof body === 'string') {
 				err.details = body
 			}
-			callback(err);
+			promise.reject(err);
 		}
+
+		return when.resolve(body);
+	}).then(function(body) {
 
 		var parser = new xml2js.Parser({ mergeAttrs: true });
 		parser.parseString(body, function(err, data) {
-			if(err) return callback(err);
+			if(err) {
+				var errParse = new Error('PARSE_ERROR');
+				errParse.err = err;
+				return callback(errParse);
+			}
 
-			callback(null, data);
+			promise.resolve(data);
 		});
-	}).otherwise(function(reason) {
-		callback(reason);
-	});
+	}).otherwise(promise.reject);
+
+	return promise.promise;
 };
 
-Plex.prototype.getCurrentlyWatching = function(callback) {
-	var url = '/status/sessions';
-	this.getXml(url, function(err, data) {
-		if(err) return callback(err);
+Plex.prototype.getCurrentlyWatching = function() {
+	var promise = when.defer();
 
-		if(data.MediaContainer.size == 0) {
-			return callback(null, []);
+	var url = '/status/sessions';
+	this.getXml(url).then(function(data) {
+		if(data.MediaContainer && data.MediaContainer.size == 0) {
+			return promise.resolve([]);
 		}
 
 		var json = [];
@@ -184,12 +165,17 @@ Plex.prototype.getCurrentlyWatching = function(callback) {
 				playingState: video.Player[0].state
 			});
 		});
-		callback(null, json);
-	});
+		promise.resolve(json);
+	}).otherwise(promise.reject);
+
+	return promise.promise;
 };
 
-Plex.prototype.getImage = function(options, callback) {
-	var location = options, imgOptions = {}, fileCacheName = '';
+Plex.prototype.getImage = function(options) {
+	var promise = when.defer()
+	  , location = options
+	  , imgOptions = {}
+	  , fileCacheName = '';
 
 	var url 	= location
 	  , imgSize = '';
@@ -206,36 +192,48 @@ Plex.prototype.getImage = function(options, callback) {
 		}
 	}
 
-	if((location.indexOf('/library/metadata/') != 0)) return callback('Invalid Location');
+	if((location.indexOf('/library/metadata/') != 0)) {
+		var err = new Error('INVALID_LOCATION');
+		err.detail = 'Invalid image location for plex';
+
+		return promise.reject('Invalid Location');
+	}
 
 
 	var fs = require('fs')
 	  , moment = require('moment');
 
-	var base = this
+	var self = this
 	  , hash = require('crypto').createHash('md5').update(location).digest("hex");
 
 	var file = './cache/plex/' + hash + imgSize;
 
-	function getImage() {
-		base.getPage(url, imgOptions).then(function(image) {
-			fs.writeFile(file, image, function(err) {});
+	function getImage(dontWriteImage) {
+		self.getPage(url, imgOptions).then(function(image) {
+			if(!dontWriteImage) {
+				fs.writeFile(file, image, function(err) {
 
-			callback(null, image);
+				});
+			}
+
+			promise.resolve(image);
 		});
 	}
 
 	fs.exists(file, function(exists) {
 		if(exists) {
 			fs.stat(file, function(err, stats) {
-				if(err) return callback(err);
+				if(err)	return getImage(true);
+
+
 				var imgCreated = moment(stats.mtime);
 				if(imgCreated.isBefore(imgCreated.subtract('days', 7))) {
 					getImage();
 				} else {
 					fs.readFile(file, function(err, image) {
-						if(err) return callback(err);
-						callback(null, image);
+						if(err) return getImage(true);
+
+						promise.resolve(image);
 					});
 				}
 			});
@@ -243,20 +241,23 @@ Plex.prototype.getImage = function(options, callback) {
 			getImage();
 		}
 	});
+
+	return promise.promise;
 };
 
-Plex.prototype.getRecentlyAdded = function(sectionId, start, size, callback) {
-	var testStart = isNaN(start)
+Plex.prototype.getRecentlyAdded = function(sectionId, start, size) {
+	var promise = when.defer()
+	  , testStart = isNaN(start)
 	  , testSize = isNaN(size);
 
 	if(testStart || testSize) {
-		callback('Invalid Options');
+		var err = new Error('INVALID_OPTIONS');
+		err.detail = 'Invalid options for getting recently added items';
+		return promise.reject(err);
 	}
 
 	var url = '/library/sections/' + sectionId + '/all?type=1&sort=addedAt:desc&X-Plex-Container-Start=' + start + '&X-Plex-Container-Size=' + size;
-	this.getXml(url, function(err, data) {
-		if(err) return callback(err);
-
+	this.getXml(url).then(function(data) {
 		var videos = [];
 		if(data.MediaContainer && data.MediaContainer.size > 0) {
 			for(var i = 0; i < data.MediaContainer.Video.length; i++) {
@@ -281,25 +282,27 @@ Plex.prototype.getRecentlyAdded = function(sectionId, start, size, callback) {
 			}
 		}
 
-		callback(null, videos);
-	});
+		return promise.resolve(videos);
+	}).otherwise(promise.reject);
+
+	return promise.promise;
 };
 
-Plex.prototype.getRecentlyAired = function(sectionId, unwatched, start, size, callback) {
-	var testStart = isNaN(start)
+Plex.prototype.getRecentlyAired = function(sectionId, unwatched, start, size) {
+	var promise = when.defer()
+	  , testStart = isNaN(start)
 	  , testSize = isNaN(size);
 
 	if(testStart || testSize) {
-		callback('Invalid Options');
+		var err = new Error('INVALID_OPTIONS');
+		err.detail = 'Invalid options for getting recently aired items';
+		return promise.reject(err);
 	}
+
 	var urlUnwatched = (unwatched) ? '&unwatched=1' : '';
 	var url ='/library/sections/' + sectionId + '/all?type=4' + urlUnwatched + '&sort=originallyAvailableAt:desc&X-Plex-Container-Start=' + start + '&X-Plex-Container-Size=' + size;
-console.log(url);
 
-	this.getXml(url, function(err, data) {
-console.log(data);
-		if(err) return callback(err);
-
+	this.getXml(url).then(function(data) {
 		var videos = [];
 		if(data.MediaContainer.size > 0) {
 
@@ -326,23 +329,26 @@ console.log(data);
 				});
 			}
 		}
-		callback(null, videos);
-	});
+		promise.resolve(videos);
+	}).otherwise(promise.reject);
+
+	return promise.promise;
 };
 
 Plex.prototype.getSectionType = function(sectionId) {
 	var promise = when.defer();
 
 	var url = '/library/sections/' + sectionId + '/all?X-Plex-Container-Size=1&X-Plex-Container-Start=0';
-	this.getXml(url, function(err, data) {
+	this.getXml(url).then(function(data) {
 		if(err) return promise.reject(err)
 
 		if(data.MediaContainer) {
 			return promise.resolve(data.MediaContainer.viewGroup);
 		}
 
+		var err = new Error();
 		promise.reject(err);
-	});
+	}).otherwise(promise.reject);
 
 	return promise.promise;
 };
@@ -350,7 +356,7 @@ Plex.prototype.getSectionType = function(sectionId) {
 Plex.prototype.ping = function() {
 	var promise = when.defer();
 
-	this.getXml('/status', function(err, data) {
+	this.getXml('/status').then(function(data) {
 		if(err) return promise.reject(err);
 
 		if(data.MediaContainer) return promise.resolve();
@@ -358,7 +364,7 @@ Plex.prototype.ping = function() {
 		var err = new Error('WRONG_SETTINGS');
 		err.reason = 'Something wrong with the Plex settings.';
 		promise.reject(err);
-	});
+	}).otherwise(promise.reject);
 
 	return promise.promise;
 };
