@@ -316,7 +316,7 @@ function validateWeather(data) {
 			apiKey: weather.apiKey,
 			lat: weather.lat,
 			long: weather.long,
-			useFahrenheit: (weather.useFahrenheit) ? weather.useFahrenheit : true
+			useFahrenheit: (weather.useFahrenheit) ? weather.useFahrenheit : false
 		};
 	} else {
 		data.config.weather = {
