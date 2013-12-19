@@ -218,9 +218,7 @@ Plex.prototype.getImage = function(options, callback) {
 	var file = './cache/plex/' + hash + imgSize;
 
 	function getImage() {
-		base.getPage(url, imgOptions, function(err, image) {
-			if(err) return callback(err);
-
+		base.getPage(url, imgOptions).then(function(image) {
 			fs.writeFile(file, image, function(err) {});
 
 			callback(null, image);
