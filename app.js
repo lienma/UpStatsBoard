@@ -27,7 +27,7 @@ config().then(function(conf) {
 	app.set('port', app.config.port);
 	app.set('views', path.join(__dirname, 'views'));
 	app.set('view engine', 'jade');
-	app.use(express.favicon());
+	//app.use(app.config.webRoot, express.favicon());
 	app.use(express.urlencoded())
 	app.use(express.json())
 	app.use(express.methodOverride());

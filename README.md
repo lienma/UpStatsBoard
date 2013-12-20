@@ -13,17 +13,18 @@ Ups Status Board is powered by [Node.js](http://www.nodejs.org/), [Express](http
 *  [Plex Media Server](http://plexapp.com/)
 *  [Sick Beard](http://sickbeard.com/)
 
+### Optional
+*  [Forecast.io Api Key](http://forecast.io/)
+
 
 ## Getting Started
 ### How to Install Node.JS
 Linux - [Installing Node.js via package manager](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager)
 
 ### How to Install UpStats Board
-1.  Run the following command:
-````
-npm install
-````
+1.  Run the following command: ```` npm install ````
 1.  Rename **config.js-sample** to **config.js**
+1.  Edit the config file, **config.js**
 
 ### How to start UpsStats Board
     node app

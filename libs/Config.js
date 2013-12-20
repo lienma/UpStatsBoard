@@ -18,6 +18,7 @@ function Config() {
 
 	getConfigData()
 		.then(validateSiteSettings)
+		.then(validateGoogleAnalytics)
 		.then(validateDrives)
 		.then(validateBandwidthServers)
 		.then(validateServices)
@@ -67,6 +68,19 @@ function validateSiteSettings(data) {
 		fs.mkdirSync(cachePath);
 	}
 
+	return when.resolve(data);
+}
+
+function validateGoogleAnalytics(data) {
+	if(_.isString(data.data.googleAnalyticsId)) {
+		data.config.googleAnalytics = true;
+		data.config.googleAnalyticsId = data.data.googleAnalyticsId;
+		data.config.googleAnalyticsUrl = data.data.googleAnalyticsUrl;
+	} else {
+		data.config.googleAnalytics = false;
+		data.config.googleAnalyticsId = '';
+		data.config.googleAnalyticsUrl = '';
+	}
 	return when.resolve(data);
 }
 
@@ -308,15 +322,26 @@ function validatePlex(data) {
 }
 
 function validateWeather(data) {
-	if(data.data.weather && data.data.weather.apiKey) {
+	if(data.data.weather && _.isString(data.data.weather.apiKey)) {
 		var weather = data.data.weather;
-	
+
+		if(!_.isString(weather.apiKey) || _.isEmpty(weather.apiKey)) {
+			return when.reject(new Error('Forecast.io A'));
+		}
+
+		if(!_.isString(weather.lat) || _.isEmpty(weather.lat)) {
+			return when.reject(new Error('The weather module requires a latitude.'));
+		}
+		if(!_.isString(weather.long) || _.isEmpty(weather.long)) {
+			return when.reject(new Error('The weather module requires a longitude.'));
+		}
+
 		data.config.weather = {
 			enabled: true,
 			apiKey: weather.apiKey,
-			lat: weather.lat,
-			long: weather.long,
-			useFahrenheit: (weather.useFahrenheit) ? weather.useFahrenheit : false
+			latitude: weather.lat,
+			longitude: weather.long,
+			useFahrenheit: (weather.useFahrenheit) ? true : false
 		};
 	} else {
 		data.config.weather = {
@@ -324,7 +349,7 @@ function validateWeather(data) {
 			apiKey: '',
 			lat: '',
 			long: '',
-			useFahrenheit: ''
+			useFahrenheit: true
 		};
 	}
 	return when.resolve(data);
