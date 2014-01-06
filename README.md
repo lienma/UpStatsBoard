@@ -1,6 +1,6 @@
 # [UpStats Board](https://github.com/lienma/UpStatsBoard)
 
-**U**senet + **p**lex + **Stats** Board, allows you to monitor your usenet services (**SABnzbd+**, **Sick Beard**, & **CouchPotato**), **Plex**, & your system (CPU Usage, Memory Usage, Bandwidth Usage, & Disk Space Usage). I want to give a special thanks to [ryanc](https://github.com/d4rk22] for his inspirational work, [Network-Status-Page](https://github.com/d4rk22/Network-Status-Page).
+**U**senet + **p**lex + **Stats** Board, allows you to monitor your usenet services (**SABnzbd+**, **Sick Beard**, & **CouchPotato**), **Plex**, & your system (CPU Usage, Memory Usage, Bandwidth Usage, & Disk Space Usage). I want to give a special thanks to [ryanc](https://github.com/d4rk22) for his inspirational work, [Network-Status-Page](https://github.com/d4rk22/Network-Status-Page).
 
 Ups Status Board is powered by [Node.js](http://www.nodejs.org/), [Express](http://www.expressjs.com/), [Bootstrap](http://www.getbootstrap.com/), [Backbone](http://www.backbonejs.org/), [jQuery](http://www.jquery.com/?), [Flot](www.flotcharts.org/), and plenty of other libraries.
 
