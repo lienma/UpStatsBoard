@@ -1,9 +1,7 @@
-var Connection 		= require('ssh2')
-  , cProcess 		= require('child_process')
-  , when 			= require('when')
-  , StringDecoder 	= require('string_decoder').StringDecoder;;
-
-var Service = require('./Service');
+var when 			= require('when');
+var Command 		= require('./../libs/Command')
+  , Service 		= require('./../libs/Service')
+  , log 			= new (require('./../libs/Logger'))('DRIVE_SPACE');
 
 var idCounter = 0;
 function Disk(label, location, options) {
@@ -15,82 +13,35 @@ function Disk(label, location, options) {
 	this.location = location;
 	this.options = (options) ? options : {};
 	this.remote = (this.options.remote) ? this.options.remote : false;
+	var service = false;
 
 	if(this.remote) {
-		var service = new Service(this.options.host, this.options.port);
-		var username = this.options.username
-		  , password = this.options.password;
-
-		this.options.username = "";
-		this.options.password = "";
+		service = new Service(this.options.host, this.options.port, {username: this.options.username, password: this.options.password});
 	}
 
-	this.command = function(cmd) {
-		var promise = when.defer()
-		  , self = this;
-
-		function runCmd(processor) {
-			processor.exec(cmd, function(err, stream) {
-				if(err) return promise.reject(err);
-
-				if(typeof stream === 'string') {
-					promise.resolve(stream);
-				} else {
-					var decoder = new StringDecoder('utf8')
-					  , resStr = '';
-
-					stream.on('data', function(data, extended) {
-						 resStr += decoder.write(data);
-					});
-					stream.on('end', function() {
-						promise.resolve(resStr);
-					});
-
-					if(self.remote) {
-						stream.on('exit', function(code, signal) {
-							processor.end();
-						});
-					}
-				}
-			});
-		}
-
-		if(this.remote) {
-			service.isOnline()(function(err, isOnline) {
-				if(isOnline) {
-					var connection = new Connection();
-					connection.connect({
-						host: service.getHost(), port: service.getPort(),
-						username: username, password: password
-					});
-
-					connection.on('error', function(err) {
-						promise.reject(err);
-					});
-
-					connection.on('ready', function() {
-						runCmd(connection);
-					});
-				} else {
-					var err = new Error('Offline');
-					err.details = 'Could not reach ' + service.getHost() + ':' + service.getPort();
-					promise.reject(err);
-				}
-			});
-		} else {
-			runCmd(cProcess);
-		}
-
-		return promise.promise;
-	};
+	this.command = Command(service);
 }
 
 Disk.prototype.getDriveSpace = function() {
+	var self = this
+	  , start = new Date().getTime();
+
+	log.debug('Getting drive space for', this.label.yellow);
 	if(this.location == '/') {
-		return getRootSpace(this);
+		var promise = getRootSpace(this);
 	} else {
-		return getFolderSpace(this);
+		var promise = getFolderSpace(this);
 	}
+
+	promise.then(function(data) {
+		var since = new Date().getTime() - start;
+
+		log.debug('Finished processing drive stats for', self.label.yellow + '.', 'Took ' + since + 'ms');
+
+		return when.resolve(data);
+	});
+
+	return promise;
 };
 
 Disk.prototype.getIcon = function() {
@@ -119,7 +70,7 @@ function getRootSpace(drive) {
 		return formatResponse(drive, parseFloat(disk_info[2]) * 1024, parseFloat(disk_info[1]) * 1024);
 	}
 
-	drive.command('df -k').then(process).then(promise.resolve);
+	drive.command('df -k').then(process).then(promise.resolve).otherwise(promise.reject);
 
 	return promise.promise;
 }
@@ -132,7 +83,7 @@ function getFolderSpace(drive) {
 		return formatResponse(drive, parseInt(find[0]) * 1024, drive.options.total);
 	}
 
-	drive.command('du -s "' + drive.location + '"').then(process).then(promise.resolve);
+	drive.command('du -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(promise.reject);
 
 	return promise.promise;
 }

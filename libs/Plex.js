@@ -1,7 +1,9 @@
 var request = require('request')
+  , crypto 	= require('crypto')
   , xml2js 	= require('xml2js')
   , when   	= require('when')
-  , os 		= require('os');
+  , os 		= require('os')
+  , pjson 	= require('./../package.json');
 
 function Plex(plexConfig) {
 	this.protocol 			= plexConfig.protocol;
@@ -20,11 +22,17 @@ Plex.prototype.getBaseUri = function() {
 
 Plex.prototype.getMyPlexToken = function() {
 	var promise = when.defer()
-	  , self = this;
+	  , self = this
+	  , headers = { 		
+		'X-Plex-Platform': os.type(),
+		'X-Plex-Platform-Version': os.release(),
+		'X-Plex-Device': 'UpStats Board (' + os.type() + ')',
+		'X-Plex-Product': 'UpStats Board',
+		'X-Plex-Version': pjson.version,
+		'X-Plex-Client-Identifier': 'UpStats Board @ ' + os.hostname() 
+	};
 
-	request.post('https://my.plexapp.com/users/sign_in.xml', {
-		headers: { 'X-Plex-Client-Identifier': 'UpStats Board @ ' + os.hostname() }
-	}, function(err, res, body) {
+	request.post('https://my.plexapp.com/users/sign_in.xml', { headers: headers }, function(err, res, body) {
 		if(err) return promise.reject(err);
 
 		if(body.substr(0, 5) != '<?xml') { //>

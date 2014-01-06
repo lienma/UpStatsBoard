@@ -50,7 +50,9 @@
 			this.textColor = this.text.css('color');
 			this.textTitle = this.text.data('tooltip-title');
 			this.textTooltip = { placement: 'left', title: this.textTitle};
+
 			this.text.tooltip(this.textTooltip);
+
 			this.text.popover({
 				placement: 'bottom', html: true,
 				content: $('#tmpl-weather-popover').html()
@@ -73,7 +75,22 @@
 			});
 
 			this.weather.on('change:currentTemp', function(model) {
-				self.text.html(model.get('currentTemp') + '&deg;');
+				var type = model.get('useFahrenheit') ? 'F' : 'C';
+				var span = '<span class="ampm">' + type + '</span>';
+				self.text.html(model.get('currentTemp') + '&deg;' + span);
+			});
+
+			this.weather.on('change:alerts', function(model) {
+				var divAlerts = $('.weather-alerts')
+				  , alerts = model.get('alerts');
+				
+				if(alerts.length == 0) {
+					divAlerts.addClass('hide');
+				} else {
+					var time = moment(alerts[0].expires * 1000).format('llll');
+					var label = divAlerts.removeClass('hide').find('.label');
+					label.html(alerts[0].title).tooltip({placement: 'bottom', title: 'In effect till ' + time});
+				}
 			});
 
 			this.text.on('shown.bs.popover', function() {
@@ -81,6 +98,10 @@
 				self.updatePopover(true);
 				self.text.css({color: $('body').css('color')});
 				self.text.tooltip('destroy');
+
+				var textWidth = self.text.width(), arrowMargin = textWidth / 2 + 6;
+
+				self.$('.popover .arrow').css({width: (textWidth + 20) + 'px', marginLeft: '-' + arrowMargin + 'px'});
 			});
 
 			this.text.on('hide.bs.popover', function() {
@@ -111,6 +132,7 @@
 			popover.find('.detail').html(model.get('currentSummary'));
 			popover.find('.next-hour').html(model.get('minutelySummary'));
 			popover.find('.next-24').html(model.get('hourlySummary'));
+
 		}
 	});
 

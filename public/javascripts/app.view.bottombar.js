@@ -1,6 +1,10 @@
 
 (function(App, $, _, Backbone) {
 
+	var StatsModel = Backbone.Model.extend({
+		url: App.Config.WebRoot + '/stats/all'
+	});
+
 	var BottomBarModel = Backbone.Model.extend({
 		idAttribute: 'selector',
 
@@ -12,26 +16,61 @@
 	var BottomBarView = Backbone.View.extend({
 		el: 'div.bottom-display-bar',
 		ul: null,
+
+		modules: [
+			{'selector': 'cpu', 'title': 'CPU', class: 'col-md-3', usingStatsModel: true},
+			{'selector': 'memory', 'title': 'Memory', class: 'col-md-3', usingStatsModel: true},
+			{'selector': 'bandwidth', 'title': 'Bandwidth', class: 'col-md-3', usingStatsModel: true},
+			{'selector': 'space', 'title': 'Total Space', class: 'col-md-3', usingStatsModel: false}
+		],
+
+		views: {},
+
 		initialize: function() {
 			this.row = this.$('div.row');
+			this.statsModel = new StatsModel();
+
+			this.buildModules();
 			this.render();
+			this.fetch();
+		},
+
+		buildModules: function() {
+			var self = this;
+			this.modules.forEach(function(module) {
+				var moduleName = module.selector
+				  , model = new BottomBarModel(module);
+
+				self.views[moduleName] = new BottomBar[moduleName]({model: model});
+				if(module.usingStatsModel) {
+					self.statsModel.on('change:' + moduleName, function(model) {
+						var newModel = model.get(moduleName);
+
+						if(_.isArray(newModel)) {
+							newModel = {collection: newModel};
+						}
+
+						self.views[moduleName].model.set(newModel);
+					}, this);
+				}
+			});
+		},
+
+		fetch: function() {
+			var self = this;
+			this.statsModel.fetch({success: function() {
+				//if(!App.Config.StopUpdating) {
+					self.fetch();
+				//}
+			}});
 		},
 
 		render: function() {
-			var base = this;
-
-			var modules = [
-				{'selector': 'cpu', 'title': 'CPU', class: 'col-md-3'},
-				{'selector': 'memory', 'title': 'Memory', class: 'col-md-3'},
-				{'selector': 'bandwidth', 'title': 'Bandwidth', class: 'col-md-3'},
-				{'selector': 'space', 'title': 'Total Space', class: 'col-md-3'}
-			];
-
-			_.each(modules, function(module) {
-				var model = new BottomBarModel(module);
-				var view = new BottomBar[module.selector]({model: model});
+			var self = this;
+			this.modules.forEach(function(module) {
+				var view = self.views[module.selector];
 				view.$el.addClass(module.class);
-				base.row.append(view.render());
+				self.row.append(view.render());
 			});
 		}
 	});
@@ -82,7 +121,8 @@
 
 				this.modal = new App.Modal.GraphMulti({
 					el: $('#bandwidthMultiModal'),
-					url: App.Config.WebRoot + '/stats/bandwidth',
+					//url: App.Config.WebRoot + '/stats/bandwidth',
+					collectionModel: this.model,
 
 					modelDefaults: {
 						label: '',
@@ -162,6 +202,9 @@
 						if(val == 0) {
 							return '0 Mbps';
 						}
+
+						val = Math.round(val * 100) / 100
+
 						return val + ' Mbps';
 					}
 				});
@@ -183,7 +226,6 @@
 		}),
 
 		'cpu': Backbone.View.extend({
-			//tagName: 'li',
 			template: _.template($('#tmpl-bottom-display-item').html()),
 
 			loading: true,
@@ -191,9 +233,30 @@
 			
 			initialize: function() {
 				var base = this;
+
 				this.listenTo(this.model, 'change', this.update);
 				this.$el.html(this.template(this.model.attributes));
-				this.modal = new App.Modal.Graph($('#cpuModal'), ['Wait', 'System', 'User'], {
+				this.modal = this.buildModal();
+
+				this.$el.click(function() {
+					if(!base.loading) {
+						base.modal.open();
+					}
+				});
+
+				this.detailDiv = this.$('.detail');
+				this.progressBarWait = $('<div/>', {title: 'Wait', rel: 'tooltip', class: 'progress-bar progress-bar-warning'});
+				this.progressBarSys = $('<div/>', {title: 'System', rel: 'tooltip', class: 'progress-bar'});
+				this.progressBarUser = $('<div/>', {title: 'User', rel: 'tooltip', class: 'progress-bar progress-bar-info'});
+
+				var progressDiv = $('<div/>', {class: 'progress'}).append(this.progressBarWait).append(this.progressBarSys).append(this.progressBarUser);
+				this.$('.progressDiv').append(progressDiv);
+				
+				this.$('[rel=tooltip]').tooltip();
+			},
+
+			buildModal: function() {
+				return new App.Modal.Graph($('#cpuModal'), ['Wait', 'System', 'User'], {
 					colors: App.Config.CPU,
 					initialize: function() {
 						this.$('.progress-bar').tooltip();
@@ -202,6 +265,7 @@
 						return val + '%';
 					},
 					update: function(model) {
+
 						var cpuModel = model.get('cpu')
 						  , loadAvgs = model.get('loadAvg')
 						  , totalCPU = model.get('totalCPUs')
@@ -231,36 +295,9 @@
 						return data.data + '%<br /><small>at %time%</small>';
 					}
 				});
-
-				this.$el.click(function() {
-					if(!base.loading) {
-						base.modal.open();
-					}
-				});
-
-				this.detailDiv = this.$('.detail');
-				this.progressBarWait = $('<div/>', {title: 'Wait', rel: 'tooltip', class: 'progress-bar progress-bar-warning'});
-				this.progressBarSys = $('<div/>', {title: 'System', rel: 'tooltip', class: 'progress-bar'});
-				this.progressBarUser = $('<div/>', {title: 'User', rel: 'tooltip', class: 'progress-bar progress-bar-info'});
-
-				var progressDiv = $('<div/>', {class: 'progress'}).append(this.progressBarWait).append(this.progressBarSys).append(this.progressBarUser);
-				this.$('.progressDiv').append(progressDiv);
-				
-				this.$('[rel=tooltip]').tooltip();
-
-				this.fetch();
 			},
 
-			fetch: function() {
-				var base = this;
-				this.model.fetch({success: function() {
-					if(!App.Config.StopUpdating) {
-						base.fetch();
-					}
-				}});
-			},
-
-			update: function() {
+			update: function(model) {
 				if(this.loading) {
 					this.$('.itemTooltip').attr('title', 'Click for more information').tooltip();
 					this.loading = false;
@@ -278,7 +315,7 @@
 				this.detailDiv.html(Math.round(totalPercent) + '%');
 
 
-				this.modal.update(this.model);
+				this.modal.update(model);
 				this.modal.updateHistory(wait, sys, user);
 			},
 
@@ -288,7 +325,6 @@
 		}),
 
 		'space': Backbone.View.extend({
-			//tagName: 'li',
 			template: _.template($('#tmpl-bottom-display-item').html()),
 			initialize: function() {
 				var base = this;
@@ -323,7 +359,7 @@
 
 				var percent = Math.floor(used / total * 100);
 
-				this.detailDiv.html(numeral(used).format('0.00 b') + ' / ' + numeral(total).format('0.00 b'));
+				this.detailDiv.html(formatBytes(used) + ' / ' + formatBytes(total));
 				var loadColor = '';
 				if(percent >= 75 && 90 > percent) {
 					loadColor = 'progress-bar-warning';
@@ -340,7 +376,6 @@
 		}),
 
 		'memory': Backbone.View.extend({
-			//tagName: 'li',
 			template: _.template($('#tmpl-bottom-display-item').html()),
 
 			history: [],
@@ -355,16 +390,16 @@
 				this.modal = new App.Modal.Graph($('#memoryModal'), ['Buffer', 'Cache', 'Used'], {
 					colors: App.Config.Memory,
 					update: function(model) {		
-						this.$('span.buffer').html(numeral(model.get('buffer')).format('0.00 b'));
-						this.$('span.cache').html(numeral(model.get('cache')).format('0.00 b'));
-						this.$('span.used').html(numeral(model.get('used')).format('0.00 b'));
+						this.$('span.buffer').html(formatBytes(model.get('buffer')));
+						this.$('span.cache').html(formatBytes(model.get('cache')));
+						this.$('span.used').html(formatBytes(model.get('used')));
 					},
 					tooltipLabel: function(data) {
-						var bytes = numeral(data.data).format('0.00 b');
+						var bytes = formatBytes(data.data);
 						return bytes + '<br /><small>at %time%</small>';
 					},
 					yAxisFormatter: function(val, axis) {
-						return numeral(val).format('0.00 b');
+						return formatBytes(val);
 					}
 				});
 
@@ -382,13 +417,6 @@
 				var progressDiv = $('<div/>', {class: 'progress'}).append(this.progressBarBuffer).append(this.progressBarCache).append(this.progressBarUsed);
 				this.$('.progressDiv').append(progressDiv);
 				this.$('[rel=tooltip]').tooltip();
-
-				this.model.fetch();
-				setInterval(function() {
-					if(!App.Config.StopUpdating) {
-						base.model.fetch();
-					}
-				}, App.Config.UpdateDelay);
 			},
 
 			update: function() {
@@ -408,7 +436,7 @@
 				this.progressBarUsed.css({width: Math.floor(used / total * 100) + '%'}).attr('data-original-title', 'Used: ' + numeral(used).format('0.00 b'));
 
 				var sum = buffer + cache + used;
-				this.detailDiv.html(numeral(sum).format('0.00 b') + ' / ' + numeral(total).format('0.00 b'));
+				this.detailDiv.html(formatBytes(sum) + ' / ' + formatBytes(total));
 
 				this.modal.update(this.model);
 				this.modal.updateHistory(buffer, cache, used);

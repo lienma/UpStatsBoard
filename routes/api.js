@@ -41,7 +41,7 @@ var api = {
 		},
 		recentlyAddedMovies: function(req, res) {
 			var plex = req.app.config.plex;
-			plex.getRecentlyAdded(plex.recentMovieSection, 0, 20).then(function(videos) {
+			plex.getRecentlyAdded(plex.recentMovieSection, 0, 18).then(function(videos) {
 				res.json(videos);
 			}).otherwise(function(reason) {
 // Show some error?
@@ -51,7 +51,7 @@ var api = {
 			var plex = req.app.config.plex;
 			var unwatched = (req.param('unwatched') == 'true') ? true : false;
 
-			plex.getRecentlyAired(plex.recentTVSection, unwatched, 0, 20).then(function(videos) {
+			plex.getRecentlyAired(plex.recentTVSection, unwatched, 0, 18).then(function(videos) {
 				res.json(videos);
 			}).otherwise(function(reason) {
 // Show some error?

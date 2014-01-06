@@ -1,5 +1,6 @@
 var request = require('request')
-  , when   	= require('when');
+  , when   	= require('when')
+  , _ 		= require('underscore');
 
 function formatShow(show) {
 	return {
@@ -46,7 +47,7 @@ SickBeard.prototype.getPage = function(cmd, filters) {
 			return promise.reject(errReject);
 		}
 
-		if(body) {
+		if(body && _.isObject(body)) {
 			if(body.result == 'success') {
 				return promise.resolve(body.data);
 			}

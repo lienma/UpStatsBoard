@@ -3,6 +3,7 @@ var when    	= require('when')
   , fs 			= require('fs')
   , path 		= require('path');
 
+
 var Bandwidth 	= require('./../libs/Bandwidth')
   , Disk 		= require('./../libs/Disk')
   , Sabnzbd 	= require('./../libs/Sabnzbd')
@@ -10,11 +11,15 @@ var Bandwidth 	= require('./../libs/Bandwidth')
   , Plex 		= require('./../libs/Plex')
   , SickBeard 	= require('./../libs/SickBeard');
 
+var log 		= new (require('./../libs/Logger'))('CONFIG');
+
 var appRoot 	= path.resolve(__dirname, '../')
   , cachePath 	= path.resolve(appRoot, 'cache');
 
 function Config() {
 	var promise = when.defer();
+
+	log.debug('Loading configuration data.')
 
 	getConfigData()
 		.then(validateSiteSettings)
@@ -29,7 +34,7 @@ function Config() {
 		.then(validateWeather)
 
 		.then(function(data) {
-			console.log('Configuration Valid!'.green);
+			log.info('Good to launch! All configuration has been validated and tested!'.green);
 
 			promise.resolve(data.config);
 		}).otherwise(promise.reject);
@@ -63,11 +68,12 @@ function validateSiteSettings(data) {
 	data.config.debugStopUpdating = (data.data.debugStopUpdating) ? true : false;
 	data.config.logHttpRequests = (data.data.logHttpRequests) ? true : false;
 
-	var cacheFolderExists = fs.existsSync(cachePath);
-	if(!cacheFolderExists) {
+	if(!fs.existsSync(cachePath)) {
+		log.debug('Cache folders does not exist. Attempting to create folder');
 		fs.mkdirSync(cachePath);
 	}
 
+	log.info('Validated general configuration'.green);
 	return when.resolve(data);
 }
 
@@ -89,19 +95,30 @@ function validateDrives(data) {
 
 	for(var label in data.data.drives) {
 		if(data.data.drives.hasOwnProperty(label)) {
-			if(_.isEmpty(label)) {
-				return when.reject(new Error('A label is required for the drive'));
-			}
-
 			var drive = data.data.drives[label];
 
 			var remote 		= (drive.remote) ? true : false
 			  , location	= (_.isString(drive.location)) ? drive.location : '/'
 			  , options 	= {};
 
+			if(_.isEmpty(label)) {
+				var error = new Error('INVALID_CONFIG');
+				error.reason = 'Missing label for one of the drives.';
+
+				var printObj = '{\n' + log.printObject(drive, 2) + '\n\t\t},';
+				error.suggestion = '\t\t"Main Hard Drive": ' + printObj;
+				error.currently = '\t\t"": ' + printObj;
+
+				return when.reject(error);
+			}
+
+
+
 			if(remote) {
 				if(!_.isString(drive.username) || _.isEmpty(drive.username)) {
-					return when.reject(new Error('Username is required for getting remote drive stats'));
+					var error = new Error('INVALID_CONFIG');
+					error.reason = 'Username is required for getting remote drive statistics.';
+					return when.reject(error);
 				}
 
 				options = {
@@ -115,7 +132,9 @@ function validateDrives(data) {
 
 			if(drive.total) {
 				if(!_.isNumber(drive.total)) {
-					return when.reject(new Error('Invalid total drive space for drive ' + label));
+					var error = new Error('INVALID_CONFIG');
+					error.reason = 'Invalid total drive space for drive ' + label + ', needs to be a number';
+					return when.reject(error);
 				}
 
 				options.total = parseFloat(drive.total) * Math.pow(1024, 4);
@@ -129,6 +148,7 @@ function validateDrives(data) {
 		}
 	}
 
+	log.info('Validated drives configuration'.green);
 	data.config.drives = drives;
 	return when.resolve(data);
 }
@@ -138,10 +158,6 @@ function validateBandwidthServers(data) {
 
 	for(var label in data.data.bandwidthServers) {
 		if(data.data.bandwidthServers.hasOwnProperty(label)) {
-			if(_.isEmpty(label)) {
-				return when.reject(new Error('A label is required for the bandwidth server'));
-			}
-
 			var server = data.data.bandwidthServers[label];
 			var remote = (server.remote) ? true : false;
 
@@ -154,9 +170,23 @@ function validateBandwidthServers(data) {
 				remote: remote
 			};
 
+			if(_.isEmpty(label)) {
+				var error = new Error('INVALID_CONFIG');
+				error.reason = 'Missing label for one of the drives.';
+
+				var printObj = '{\n' + log.printObject(server, 2) + '\n\t\t},';
+				error.suggestion = '\t\t"Home Server": ' + printObj;
+				error.currently = '\t\t"": ' + printObj;
+
+				return when.reject(error);
+
+			}
+
 			if(remote) {
 				if(!_.isString(server.username) || _.isEmpty(server.username)) {
-					return when.reject(new Error('Username is required for getting remote bandwidth stats'));
+					var error = new Error('INVALID_CONFIG');
+					error.reason = 'Username is required for getting bandwidth statistics from remote source.';
+					return when.reject(error);
 				}
 
 				options.host = (_.isString(server.host)) ? server.host : 'localhost',
@@ -164,11 +194,11 @@ function validateBandwidthServers(data) {
 				options.username = server.username,
 				options.password = (_.isString(server.password)) ? server.password : ''
 			};
-
 			servers.push(new Bandwidth(options));
 		}
 	}
 
+	log.info('Validated bandwidth servers configuration.'.green);
 	data.config.bandwidth = servers;
 	return when.resolve(data);
 }
@@ -178,18 +208,30 @@ function validateServices(data) {
 
 	for(var label in data.data.services) {
 		if(data.data.services.hasOwnProperty(label)) {
-			if(_.isEmpty(label)) {
-				return when.reject(new Error('A label is required for the services'));
-			}
-
 			var service = data.data.services[label];
 
+			if(_.isEmpty(label)) {
+				var error = new Error('INVALID_CONFIG');
+				error.reason = 'Missing label for one of the monitoring services.';
+
+				var printObj = '{\n' + log.printObject(service, 2) + '\n\t\t},';
+				error.suggestion = '\t\t"WebSite": ' + printObj;
+				error.currently = '\t\t"": ' + printObj;
+
+				return when.reject(error);
+			}
+
+
 			if(!_.isString(service.host) || _.isEmpty(service.host)) {
-				return when.reject(new Error('Host must be specified for this service'));
+				var error = new Error('INVALID_CONFIG');
+				error.reason = 'A host must be specified for this monitoring service, ' + label;
+				return when.reject(error);
 			}
 
 			if(!_.isNumber(service.port)) {
-				return when.reject(new Error('Port must be specified for this service'));
+				var error = new Error('INVALID_CONFIG');
+				error.reason = 'A port must be specified for this monitoring service, ' + label;
+				return when.reject(error);
 			}
 
 			services.push(new Service(service.host, service.port, {
@@ -198,6 +240,7 @@ function validateServices(data) {
 		}
 	}
 
+	log.info('Validated monitoring services configuration'.green);
 	data.config.services = services;
 	return when.resolve(data);
 }
@@ -207,7 +250,9 @@ function validateSickbeard(data) {
 	var sbData = data.data.sickbeard;
 
 	if(!_.isString(sbData.apiKey) || _.isEmpty(sbData.apiKey)) {
-		return when.reject(new Error('SickBeard api key is required'));
+		var error = new Error('INVALID_CONFIG');
+		error.reason = 'A Sick Beard api key is required to run this app.';
+		return when.reject(error);
 	}
 
 	var options = {
@@ -226,8 +271,11 @@ function validateSickbeard(data) {
 
 	var sickbeard = new SickBeard(options);
 
-	console.log('Testing sickbeard\'s api key'.grey);
+	log.debug('Testing Sick Beard\'s api key');
 	sickbeard.ping().then(function() {
+		log.debug('Successful ping to Sick Beard.');
+
+		log.info('Validated Sick Beard configuration'.green);
 		data.config.sickbeard = sickbeard;
 		promise.resolve(data);
 
@@ -239,7 +287,10 @@ function validateSickbeard(data) {
 
 	var sickbeardCacheFolder = path.join(cachePath, 'sickbeard');
 	var cacheFolderExists = fs.existsSync(sickbeardCacheFolder);
+	log.debug('Does Sick Beard cache folder exist? ' + cacheFolderExists);
+
 	if(!cacheFolderExists) {
+		log.debug('Creating cache folder for Sick Beard.');
 		fs.mkdirSync(sickbeardCacheFolder);
 	}
 
@@ -291,30 +342,39 @@ function validatePlex(data) {
 		return promise.promise;
 	}
 
-	console.log('Getting token for myPlex.'.grey);
+	log.debug('Getting plex token for myPlex.');
 	plex.getMyPlexToken()
-.then(function() { console.log('Sending ping to plex'); })
+
+		.then(function() { log.debug('Sending a ping to the plex media server.'); })
 		.then(plex.ping.bind(plex))
-.then(function() { console.log('Checking tv section id'); })
+
+		.then(function() { log.debug('Checking to see if th tv section id is proper - ' + options.recentTVSection); })
 		.then(function() {
 			var err = new Error('WRONG_TV_SECTION_ID');
 			err.reason = 'The TV section ID is not a tv section.';
 			return vaidateSection(options.recentTVSection, 'show', err);
 		})
-.then(function() { console.log('Checking movie section id'); })
+
+		.then(function() { log.debug('Checking to see if th movie section id is proper - ' + options.recentMovieSection); })
 		.then(function() {
 			var err = new Error('WRONG_MOVIE_SECTION_ID');
 			err.reason = 'The Movie section ID is not a movie section.';
 			return vaidateSection(options.recentMovieSection, 'movie', err);
 		})
+
 		.then(function() {
+			log.info('Validated Plex configuration'.green);
 			data.config.plex = plex;
 			promise.resolve(data);
-		}).otherwise(promise.reject);
+		})
+	.otherwise(promise.reject);
 
 	var plexCacheFolder = path.join(cachePath, 'plex');
 	var cacheFolderExists = fs.existsSync(plexCacheFolder);
+	log.debug('Does Plex cache folder exist? ' + cacheFolderExists);
+
 	if(!cacheFolderExists) {
+		log.debug('Creating cache folder for Plex.');
 		fs.mkdirSync(plexCacheFolder);
 	}
 
@@ -326,7 +386,7 @@ function validateWeather(data) {
 		var weather = data.data.weather;
 
 		if(!_.isString(weather.apiKey) || _.isEmpty(weather.apiKey)) {
-			return when.reject(new Error('Forecast.io A'));
+			return when.reject(new Error('Forecast.io Api key is required.'));
 		}
 
 		if(!_.isString(weather.lat) || _.isEmpty(weather.lat)) {
@@ -343,15 +403,19 @@ function validateWeather(data) {
 			longitude: weather.long,
 			useFahrenheit: (weather.useFahrenheit) ? true : false
 		};
+
+		log.info('Validated Forecast.io weather configuration');
 	} else {
 		data.config.weather = {
 			enabled: false,
 			apiKey: '',
-			lat: '',
-			long: '',
+			latitude: '',
+			longitude: '',
 			useFahrenheit: true
 		};
+		log.debug('No Forecase.io api key present. Weather module is disabled.');
 	}
+
 	return when.resolve(data);
 }
 

@@ -17,7 +17,7 @@ block content
       h4 Next 24 Hours
       h5.next-24
     p.small.text-right.no-link-color
-      a(href='http://forecast.io/#/f/' + locals.weatherLat + ',' + locals.weatherLong) Forecast.io
+      a(href='http://forecast.io/#/f/' + locals.weatherLocation, target='_blank') Forecast.io
 
   script(type='text/template')#tmpl-panel-upcoming-show-item
     td
@@ -238,6 +238,9 @@ block content
       .right-container.pull-right
         table
           tr
+            td
+              .weather-alerts.hide
+                span.label.label-danger
             td
               .weather-container
                 .tempature.text(data-tooltip-title='Click to see weather')

@@ -2,13 +2,18 @@
 exports.index = function(req, res) {
 	res.render('index', {
 		debugStopUpdating: (req.app.config.debugStopUpdating) ? 'true' : 'false',
+
 		googleAnalytics: req.app.config.googleAnalytics,
 		googleAnalyticsId: req.app.config.googleAnalyticsId,
 		googleAnalyticsUrl: req.app.config.googleAnalyticsUrl,
+
 		title: 'UpStats Board',
+
 		weatherEnabled: (req.app.config.weather.enabled) ? 'true' : 'false',
-		weatherLat: req.app.config.weather.lat,
-		weatherLong: req.app.config.weather.long,
+		weatherLat: req.app.config.weather.latitude,
+		weatherLocation: req.app.config.weather.latitude + ',' + req.app.config.weather.longitude,
+		weatherLong: req.app.config.weather.longitude,
+
 		webRoot: (req.app.config.webRoot == '/') ? '' : req.app.config.webRoot,
 	});
 };

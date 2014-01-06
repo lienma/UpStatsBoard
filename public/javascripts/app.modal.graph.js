@@ -37,7 +37,7 @@
 
 
 	function ModalMulti(options) {
-		var base = this;
+		var self = this;
 
 		this.options = _.defaults(options, defaultOptions);
 		this.$el = $(this.options.el);
@@ -48,7 +48,7 @@
 
 		this.body = function(id) {
 			var paneId = '#paneId' + id;
-			var body = base.$(paneId);
+			var body = self.$(paneId);
 
 			return new (function() {
 				this.editField = function(field, text) {
@@ -69,9 +69,11 @@
 			modalPanel: 	null
 		});
 
+		var collectionUrl = this.options.url ? this.options.url : false;
+
 		var Collection = Backbone.Collection.extend({
 			model: Model,
-			url: this.options.url,
+			url: collectionUrl,
 	
 			getDefaultModel: function() {
 				var model = this.findWhere({default: true});
@@ -79,24 +81,35 @@
 			}
 		});
 
-
 		this.collection = new Collection();
 		this.setupModalEvents();
 
-		this.collection.fetch({success: function() {
-			if(base.collection.size() == 1) {
-				base.$('ul.nav-tabs').hide();
-			}
+		if(collectionUrl) {
+			this.collection.fetch({success: function() {
+				if(self.collection.size() == 1) {
+					self.$('ul.nav-tabs').hide();
+				}
+	
+				self.collection.each(function(model) {
+					self.addTab(model);
+				});
+				self.options.initialize.call(this, self.collection);
+	
+				if(!App.Config.StopUpdating) {
+					self.fetch();
+				}
+			}});
+		} else {
+			options.collectionModel.on('change:collection', function(model) {
+				self.collection.set(model.get('collection'));
+			}, this);
 
-			base.collection.each(function(model) {
-				base.addTab(model);
+			options.collectionModel.once('change:collection', function(model) {
+				self.buildTabs();
 			});
-			base.options.initialize.call(this, base.collection);
 
-			if(!App.Config.StopUpdating) {
-				base.fetch();
-			}
-		}});
+
+		}
 	}
 
 	ModalMulti.prototype.activeModel = {};
@@ -201,6 +214,19 @@
 		model.modalPanel.find('button.close').click(function() {
 			model.modalPanel.find('.alertBackground').hide();
 		});
+	};
+
+	ModalMulti.prototype.buildTabs = function() {
+		var self = this;
+
+		if(this.collection.size() == 1) {
+			this.$('ul.nav-tabs').hide();
+		}
+		
+		this.collection.each(function(model) {
+			self.addTab(model);
+		});
+		this.options.initialize.call(this, this.collection);
 	};
 
 	ModalMulti.prototype.getActivePanel = function() {
@@ -353,13 +379,6 @@
 			}
 		};
 	};
-
-
-
-
-
-
-
 
 
 

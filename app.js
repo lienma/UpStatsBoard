@@ -13,12 +13,16 @@ var express 		= require('express')
 var api 		= require('./routes/api')
   , routes 		= require('./routes')
   , stats 		= require('./routes/stats')
-  , config 		= require('./libs/Config');
+  , config 		= require('./libs/Config')
+  , Logger 		= require('./libs/Logger');
 
 var publicPath 	= path.join(__dirname, 'public')
   , app 		= express();
-var server 		= http.createServer(app);
+var server 		= http.createServer(app)
+  , logger 		= new Logger('MAIN_APP')
+  , envVal 		= process.env.NODE_ENV || 'development';
 
+logger.info('Starting up app in ' + envVal + ' environment.');
 config().then(function(conf) {
 	app.config = conf;
 
@@ -81,6 +85,7 @@ config().then(function(conf) {
 	app.get(webRoot + '/api/sickbeard/showsStats', api.sickbeard.showsStats);
 	app.get(webRoot + '/api/sickbeard/upcoming', api.sickbeard.upcoming);
 
+	app.get(webRoot + '/stats/all', stats.all);
 	app.get(webRoot + '/stats/bandwidth', stats.bandwidth);
 	app.get(webRoot + '/stats/cpu', stats.cpu);
 	app.get(webRoot + '/stats/disks', stats.disks);
@@ -92,14 +97,28 @@ config().then(function(conf) {
 	server.listen(app.get('port'), app.get('host'), function() {
 		var uri = app.get('host') + ':' + app.get('port') + app.config.webRoot;
 
-		console.log('StatusBoard'.yellow, 'is running at',  uri.cyan);
+		logger.info('StatusBoard'.yellow, 'is running at',  uri.cyan);
+		//console.log('StatusBoard'.yellow, 'is running at',  uri.cyan);
 	});
 }).otherwise(function(reason) {
-	var msg = reason;
-console.log('instance:', reason instanceof Error);
-	if(reason instanceof Error) {
-		msg = reason.message;
-	}
 
-	console.log('Error occurred while validating config data:'.red, msg);
+	if(reason instanceof Error) {
+		if(reason.message == 'INVALID_CONFIG') {
+			logger.fatal(reason.reason);
+
+			if(reason.currently) {
+				console.log('Currently is the configuration file:'.green);
+				console.log(reason.currently);
+			}
+			if(reason.suggestion) {
+				console.log('Suggestion:'.green);
+				console.log(reason.suggestion);
+			}
+		} else {
+			logger.error(reason.message);
+			console.log(reason);
+		}
+	} else {
+		logger.fatal(reason);
+	}
 });
