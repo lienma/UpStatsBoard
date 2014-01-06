@@ -1,12 +1,19 @@
 var fs 		= require('fs')
   , moment 	= require('moment')
   , os 		= require('os')
+  , path 	= require('path')
   , when   	= require('when')
   , _    	= require('underscore');
 
 
 function Logger(module) {
-	this.filePath = process.env.DEBUG_PATH || 'debug.log';
+	var logsPath = path.resolve(__dirname, '../', 'logs');
+
+	if(!fs.existsSync(logsPath)) {
+		fs.mkdirSync(logsPath);
+	}
+
+	this.filePath = process.env.DEBUG_PATH || path.join(logsPath, 'debug.log');
 	this.module = module;
 
 	var logExists = fs.existsSync(this.filePath);
@@ -101,7 +108,7 @@ Logger.prototype.log = function(type, message) {
 	}
 
 	logMessage = logMessage.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]/g, '');
-	fs.appendFileSync(this.filePath, logMessage);
+	fs.appendFileSync(this.filePath, logMessage + '\n');
 };
 
 exports = module.exports = Logger;
