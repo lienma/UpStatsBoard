@@ -6,11 +6,7 @@
 	});
 
 	var BottomBarModel = Backbone.Model.extend({
-		idAttribute: 'selector',
-
-		urlRoot: function(){
-			return App.Config.WebRoot + '/stats/';
-		}
+		idAttribute: 'selector'
 	});
 
 	var BottomBarView = Backbone.View.extend({
@@ -58,11 +54,26 @@
 
 		fetch: function() {
 			var self = this;
-			this.statsModel.fetch({success: function() {
-				//if(!App.Config.StopUpdating) {
-					self.fetch();
-				//}
-			}});
+
+			var failedCount = 0;
+
+			var timeout = setTimeout(function() {
+				fetch();
+				failedCount += 1;
+			}, 15000);
+
+
+			function fetch() {
+				self.statsModel.fetch({success: function() {
+					if(!App.Config.StopUpdating) {
+						self.fetch();
+					}
+					clearTimeout(timeout);
+					failedCounter = 0;
+				}});
+			}
+
+			fetch();
 		},
 
 		render: function() {

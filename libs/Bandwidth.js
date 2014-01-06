@@ -88,24 +88,46 @@ Bandwidth.prototype.getBandwidth = function() {
 			label: self.getLabel(),
 			default: self.isDefault(),
 			max: self.getMax(),
+
+			offline: false,
+			dateSince: results[1].dateSince,
+			download: results[0].download,
+			upload: results[0].upload,
+
+			total: results[1].total,
+			lastMonth: results[1].lastMonth,
+			thisMonth: results[1].thisMonth,
+			today: results[1].today
+		};
+		promise.resolve(json);
+	}).otherwise(function(reason) {
+		var json = {
+			_id: self.getID(),
+			label: self.getLabel(),
+			default: self.isDefault(),
+			max: self.getMax(),
+
+			err: reason.message,
+			offline: true
 		};
 
-		//if(err === null) {
-			json.offline = false;
-			json.dateSince= results[1].dateSince;
-			json.download = results[0].download;
-			json.upload = results[0].upload;
+		switch(reason.message) {
+			case 'AUTHENTICATION_FAILED':
+				json.detail = 'Username and password failed. Please double check username and password for bandwidth server \'' + self.label + '\'';
+				break;
 
-			json.total = results[1].total;
-			json.lastMonth = results[1].lastMonth;
-			json.thisMonth = results[1].thisMonth;
-			json.today = results[1].today;
-		//} else {
-		//	json.offline = true;
-		//}
+			case 'CONNECTION_FAILED':
+			case 'SERVER_OFFLINE':
+				json.detail = 'Connection failed. Please double check the settings for bandwidth server \'' + self.label + '\'';
+				break;
+
+			case 'CONNECTION_TIMEOUT':
+				json.detail = 'Connection timed out to bandwidth server \'' + self.label + '\'';
+				break;
+		}
 
 		promise.resolve(json);
-	}).otherwise(promise.reject);
+	});
 
 	return promise.promise;
 };

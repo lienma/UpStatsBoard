@@ -27,12 +27,38 @@ function Service(host, port, options) {
 			self.isOnline().then(function(isOnline) {
 				if(isOnline) {
 					var connection = new Connection();
-					connection.connect({
-						host: self.host, port: self.port,
-						username: username, password: password
+
+					var sock = new require('net').Socket();
+					sock.setTimeout(10000, function() {
+						var erro = new Error('CONNECTION_TIMEOUT');
+						erro.reason = 'Connection to ' + self.toString().yellow + ' has timed out!';
+						promise.reject(erro);
+
+						sock.destroy();
 					});
+					sock.setNoDelay(true);
+					sock.setMaxListeners(0);
+					sock.connect(self.port, self.host);
+
+					connection.connect({ username: username, password: password, sock: sock});
 
 					connection.on('error', function(err) {
+console.log('Connection Err:'.red, err);
+						var error = false;
+						if(err.level == 'authentication') {
+							var erro = new Error('AUTHENTICATION_FAILED');
+							erro.reason = 'Authentication to ' + self.toString().yellow + ' failed!';
+						}
+
+						if(err.code == 'ECONNREFUSED') {
+							var erro = new Error('CONNECTION_FAILED');
+							erro.reason = 'Connection to ' + self.toString().yellow + ' failed!';
+						}
+
+						if(erro) {
+							return promise.reject(erro);
+						}
+
 						promise.reject(err);
 					});
 
@@ -78,18 +104,18 @@ Service.prototype.toString = function() {
 	return this.host + ':' + this.port;
 };
 
-Service.prototype.isOnline = function() {
+Service.prototype.isOnline = function(returnSocket) {
 	var promise = when.defer()
 	  , self = this, isOnline = false
 	  , Socket = new require('net').Socket();
 
-	Socket.setTimeout(400);
+	Socket.setTimeout(500);
 	Socket.connect(this.port, this.host);
 
 	Socket.on('connect', function() {
 		isOnline = true;
 		promise.resolve(true);
-		Socket.end();
+		Socket.destroy();
 	});
 
 	function failed() {

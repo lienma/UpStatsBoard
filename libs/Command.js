@@ -16,7 +16,20 @@ function Command(service) {
 
 		if(this.remote) {
 			log.debug('Initializing command on remote server.', '(ref #' + refId + ')');
-			service.connect().then(execute).otherwise(promise.reject);
+			service.connect().then(execute).otherwise(function(reason) {
+console.log('Service Connect:'.red, reason.message);
+
+				switch(reason.message) {
+					case 'AUTHENTICATION_FAILED':
+					case 'CONNECTION_FAILED':
+					case 'CONNECTION_TIMEOUT':
+					case 'SERVER_OFFLINE':
+						log.error('Command failed to sent.', reason.reason, '(ref #' + refId + ')');
+						break;
+				}
+
+				return promise.reject(reason);
+			});
 		} else {
 			execute(cProcess);
 		}
@@ -27,8 +40,10 @@ function Command(service) {
 			log.debug('Excuting command (ref #' + refId + ', ' + remoteStr + '):', cmd.cyan);
 
 			processor.exec(cmd, function(err, stream) {
-				if(err) return promise.reject(err);
-
+				if(err) {
+console.log('Command Err:'.red, err);
+return promise.reject(err);
+}
 				var logMsg = 'Finished executing command.'.yellow + '(ref #' + refId + ', ' + remoteStr + ')';
 
 				if(typeof stream === 'string') {

@@ -70,7 +70,26 @@ function getRootSpace(drive) {
 		return formatResponse(drive, parseFloat(disk_info[2]) * 1024, parseFloat(disk_info[1]) * 1024);
 	}
 
-	drive.command('df -k').then(process).then(promise.resolve).otherwise(promise.reject);
+	drive.command('df -k').then(process).then(promise.resolve).otherwise(function(reason) {
+		var json = {err: reason.message, offline: true};
+
+		switch(reason.message) {
+			case 'AUTHENTICATION_FAILED':
+				json.detail = 'Username and password failed. Please double check username and password for drive settings \'' + self.label + '\'';
+				break;
+
+			case 'CONNECTION_FAILED':
+			case 'SERVER_OFFLINE':
+				json.detail = 'Connection failed. Please double check the settings for drive settings \'' + self.label + '\'';
+				break;
+
+			case 'CONNECTION_TIMEOUT':
+				json.detail = 'Connection timed out to getting drive information \'' + self.label + '\'';
+				break;
+		}
+
+		promise.resolve(json);
+	});
 
 	return promise.promise;
 }
@@ -83,7 +102,26 @@ function getFolderSpace(drive) {
 		return formatResponse(drive, parseInt(find[0]) * 1024, drive.options.total);
 	}
 
-	drive.command('du -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(promise.reject);
+	drive.command('du -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
+		var json = {err: reason.message, offline: true};
+
+		switch(reason.message) {
+			case 'AUTHENTICATION_FAILED':
+				json.detail = 'Username and password failed. Please double check username and password for drive settings \'' + self.label + '\'';
+				break;
+
+			case 'CONNECTION_FAILED':
+			case 'SERVER_OFFLINE':
+				json.detail = 'Connection failed. Please double check the settings for drive settings \'' + self.label + '\'';
+				break;
+
+			case 'CONNECTION_TIMEOUT':
+				json.detail = 'Connection timed out to getting drive information \'' + self.label + '\'';
+				break;
+		}
+
+		promise.resolve(json);
+	});
 
 	return promise.promise;
 }

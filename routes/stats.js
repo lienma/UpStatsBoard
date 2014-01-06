@@ -197,7 +197,6 @@ function getBandwidth(req) {
 	}
 
 	when.all(funcArray).then(function(results) {
-console.log('Hello');
 		promise.resolve(results);
 	}).otherwise(function(reason) {
 console.log(reason);

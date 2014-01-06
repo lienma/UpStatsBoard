@@ -98,7 +98,6 @@ config().then(function(conf) {
 		var uri = app.get('host') + ':' + app.get('port') + app.config.webRoot;
 
 		logger.info('StatusBoard'.yellow, 'is running at',  uri.cyan);
-		//console.log('StatusBoard'.yellow, 'is running at',  uri.cyan);
 	});
 }).otherwise(function(reason) {
 
