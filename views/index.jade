@@ -1,7 +1,8 @@
 extends layout
 
 block javascript
-  include index.js.uglify
+  script(type='text/javascript')
+    include:uglify index.js
 block content
   script(type='text/template')#tmpl-weather-popover
     table
