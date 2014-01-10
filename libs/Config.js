@@ -165,6 +165,9 @@ function validateBandwidthServers(data) {
 				label: label,
 				'default': (server['default']) ? true : false,
 
+				vnstatPath: (_.isString(server.vnstatPath)) ? server.vnstatPath : 'vnstat',
+				vnstatDBDirectory: (_.isString(server.vnstatDBDirectory)) ? server.vnstatDBDirectory : false,
+
 				interface: (_.isString(server.interface)) ? server.interface : 'eth0',
 				max: (server.maxSpeed) ? server.maxSpeed : [100, 100],
 				remote: remote

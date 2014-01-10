@@ -130,9 +130,16 @@
 
 			popover.find('.tempature').html(model.get('currentTemp') + '&deg;');
 			popover.find('.detail').html(model.get('currentSummary'));
-			popover.find('.next-hour').html(model.get('minutelySummary'));
 			popover.find('.next-24').html(model.get('hourlySummary'));
 
+			var nextHour = model.get('minutelySummary');
+			if(nextHour) {
+				popover.find('.next-hour-title');
+				popover.find('.next-hour').show().html(nextHour);
+			} else {
+				popover.find('.next-hour-title').hide();
+				popover.find('.next-hour').hide();
+			}
 		}
 	});
 

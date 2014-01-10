@@ -37,10 +37,10 @@ var Bandwidth = (function() {
 
 		this.remote = (bwConfig.remote) ? bwConfig.remote : false;
 		this.interface = (bwConfig.interface) ? bwConfig.interface : 'eth0';
-		
+		this.vnstatPath = (bwConfig.vnstatPath) ? bwConfig.vnstatPath : 'vnstat';
+		this.vnstatDBDirectory = (bwConfig.vnstatDBDirectory) ? bwConfig.vnstatDBDirectory : false;
 
 		this.max = bwConfig.max;
-
 
 		var service = false;
 		if(this.remote) {
@@ -138,8 +138,9 @@ Bandwidth.prototype.getLiveBandwidth = function() {
 
 	log.debug('Getting live bandwidth data for', this.label.yellow, 'from', ((this.remote) ? 'remote' : 'local'), 'server.');
 
-	var cmd = 'vnstat -i ' + self.interface + ' -tr';
-	self.command(cmd).then(process).then(promise.resolve).otherwise(promise.reject);
+	var dirDb = (this.vnstatDBDirectory) ? ' --dbdir ' + this.vnstatDBDirectory : '';
+	var cmd = this.vnstatPath + dirDb + ' -i ' + this.interface + ' -tr';
+	this.command(cmd).then(process).then(promise.resolve).otherwise(promise.reject);
 
 	return promise.promise;
 
@@ -167,8 +168,9 @@ Bandwidth.prototype.getStats = function() {
 	var self = this, start = new Date().getTime()
 	  , promise = when.defer();
 
-	var cmd = 'vnstat -i ' + this.interface + ' --xml';
-	self.command(cmd).then(process).then(promise.resolve).otherwise(promise.reject);
+	var dirDb = (this.vnstatDBDirectory) ? ' --dbdir ' + this.vnstatDBDirectory : '';
+	var cmd = this.vnstatPath + dirDb + ' -i ' + this.interface + ' --xml';
+	this.command(cmd).then(process).then(promise.resolve).otherwise(promise.reject);
 
 	return promise.promise;
 

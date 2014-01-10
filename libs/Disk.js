@@ -1,4 +1,5 @@
-var when 			= require('when');
+var when 			= require('when')
+  , _ 				= require('underscore');
 var Command 		= require('./../libs/Command')
   , Service 		= require('./../libs/Service')
   , log 			= new (require('./../libs/Logger'))('DRIVE_SPACE');
@@ -23,25 +24,30 @@ function Disk(label, location, options) {
 }
 
 Disk.prototype.getDriveSpace = function() {
-	var self = this
+	var self = this, promise = when.defer()
 	  , start = new Date().getTime();
 
-	log.debug('Getting drive space for', this.label.yellow);
-	if(this.location == '/') {
-		var promise = getRootSpace(this);
-	} else {
-		var promise = getFolderSpace(this);
-	}
+	log.debug('Getting drive space for', this.label.yellow, 'using', 'df'.red, 'command');
 
-	promise.then(function(data) {
+	
+	df(this).then(function(data) {
+		if(_.isNaN(data.used)) {
+			log.debug('Falling back to', 'du'.red, 'for', self.label.yellow);
+			du(self).then(finish).otherwise(promise.reject);
+		} else {
+			finish(data);
+		}
+	}).otherwise(promise.reject)
+
+	function finish(data) {
 		var since = new Date().getTime() - start;
 
 		log.debug('Finished processing drive stats for', self.label.yellow + '.', 'Took ' + since + 'ms');
 
-		return when.resolve(data);
-	});
+		promise.resolve(data);
+	}
 
-	return promise;
+	return promise.promise;
 };
 
 Disk.prototype.getIcon = function() {
@@ -59,7 +65,7 @@ function formatResponse(drive, used, total) {
 	};
 }
 
-function getRootSpace(drive) {
+function df(drive) {
 	var promise = when.defer();
 
 	function process(stdout) {
@@ -70,7 +76,7 @@ function getRootSpace(drive) {
 		return formatResponse(drive, parseFloat(disk_info[2]) * 1024, parseFloat(disk_info[1]) * 1024);
 	}
 
-	drive.command('df -k').then(process).then(promise.resolve).otherwise(function(reason) {
+	drive.command('df "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
 		var json = {err: reason.message, offline: true};
 
 		switch(reason.message) {
@@ -94,7 +100,7 @@ function getRootSpace(drive) {
 	return promise.promise;
 }
 
-function getFolderSpace(drive) {
+function du(drive) {
 	var promise = when.defer();
 
 	function process(stdout) {

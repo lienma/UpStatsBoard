@@ -102,7 +102,7 @@ exports.weather = function(req, res) {
 	request({
 		uri: url, json: true, timeout: 10000
 	}, function(err, resp, body) {
-		if(err) {
+		if(err && !body.currently) {
 			res.json({});
 		}
 
@@ -113,7 +113,7 @@ exports.weather = function(req, res) {
 			currentWindSpeed: Math.round(body.currently.windSpeed),
 			currentWindBearing: body.currently.windBearing,
 
-			minutelySummary: body.minutely.summary,
+			minutelySummary: (body.minutely) ? body.minutely.summary : false,
 			hourlySummary: body.hourly.summary,
 
 			useFahrenheit: config.useFahrenheit,
