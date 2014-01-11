@@ -1,6 +1,5 @@
 
-var async = require('async')
-  , moment 	= require('moment')
+var moment 	= require('moment')
   , when 	= require('when')
   , xml2js 	= require('xml2js');
 

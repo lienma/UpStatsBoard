@@ -7,7 +7,6 @@ var express 		= require('express')
   , nib 			= require('nib')
   , http 			= require('http')
   , path 			= require('path')
-  , async 			= require('async')
   , expressUglify 	= require('express-uglify');
 
 var api 		= require('./routes/api')

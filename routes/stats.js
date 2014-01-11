@@ -37,19 +37,14 @@ exports.memory = function(req, res) {
 };
 
 exports.disks = function(req, res) {
-	var Disk = require('../libs/Disk')
-	  , async = require('async');
-
 	var drives = req.app.config.drives;
 
 	var funcArray = [];
-	for(var i = 0; i < drives.length; i++) {
-		funcArray.push(drives[i].getDriveSpace());
-	}
+	drives.forEach(function(drive) {
+		funcArray.push(drive.getDriveSpace());
+	});
 
-	var promise = when.all(funcArray);
-
-	promise.then(function(results) {
+	when.all(funcArray).then(function(results) {
 		res.json(results);
 
 	}).otherwise(function(reason) {
@@ -58,17 +53,14 @@ exports.disks = function(req, res) {
 };
 
 exports.services = function(req, res) {
-	var async = require('async');
 	var services = req.app.config.services;
 
 	var funcArray = [];
-	for(var i = 0; i < services.length; i++) {
-		funcArray.push(services[i].isOnline());
-	}
+	services.forEach(function(service) {
+		funcArray.push(service.isOnline());
+	});
 
-	var promise = when.all(funcArray);
-
-	promise.then(function(results) {
+	when.all(funcArray).then(function(results) {
 		var resServices = [];
 		for(var i = 0; i < results.length; i++) {
 			var online = results[i]
@@ -89,7 +81,6 @@ exports.services = function(req, res) {
 		res.json([]);
 	});
 };
-
 
 exports.weather = function(req, res) {
 	var config = req.app.config.weather;
