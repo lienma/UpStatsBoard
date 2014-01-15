@@ -105,7 +105,7 @@ function du(drive) {
 
 	function process(stdout) {
 		var find = stdout.match(/(\d+)/);
-		return formatResponse(drive, parseInt(find[0]) * 1024, drive.options.total);
+		return formatResponse(drive, parseInt(find[0]), drive.options.total);
 	}
 
 	drive.command('du --block-size=1 -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
