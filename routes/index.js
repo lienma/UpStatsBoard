@@ -7,6 +7,8 @@ exports.index = function(req, res) {
 		googleAnalyticsId: req.app.config.googleAnalyticsId,
 		googleAnalyticsUrl: req.app.config.googleAnalyticsUrl,
 
+		isMacOs: req.app.isMacOs,
+
 		title: 'UpStats Board',
 
 		weatherEnabled: (req.app.config.weather.enabled) ? 'true' : 'false',

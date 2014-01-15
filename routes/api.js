@@ -37,6 +37,7 @@ var api = {
 				res.send(image);
 			}).otherwise(function(reason) {
 // Show some error?
+console.log(reason);
 			});
 		},
 		recentlyAddedMovies: function(req, res) {

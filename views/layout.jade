@@ -28,6 +28,7 @@ html(lang='en')
     script(type='text/javascript')
       include:uglify layout.js
     script(type='text/javascript').
+      App.Config.IsMacOs = #{locals.isMacOs};
       App.Config.WebRoot = '#{locals.webRoot}';
       App.Config.StopUpdating = #{locals.debugStopUpdating};
       App.Config.weatherEnabled = #{locals.weatherEnabled};

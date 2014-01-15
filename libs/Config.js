@@ -61,6 +61,8 @@ function getConfigData() {
 }
 
 function validateSiteSettings(data) {
+	data.config.runningMode = (data.data.runningMode) ? data.data.runningMode : 'normal';
+
 	data.config.host 	= (data.data.host) ? data.data.host : '0.0.0.0';
 	data.config.port	= (data.data.port) ? data.data.port : 8084;
 	data.config.webRoot = (data.data.webRoot || data.data.webRoot != '/') ? data.data.webRoot : '';

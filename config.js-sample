@@ -39,25 +39,28 @@ var config = module.exports = {
 
 	"bandwidthServers": {
 		"Label": {
-			"default": true,
+			// This allows you to display on bottom bar, when you have multiple bandwidth monitors.
+			"default": 	true,
+
 			//          [Download, Upload]
 			"maxSpeed": [100, 100],
-			"remote": false,
+			"remote": 	false,
 
 			// Optional, Select the interface to to watch
 			"interface": "eth0",
 
 			// Optional, Select the path of vnStat, if not at the default location.
-			"vnstatPath": "",
+			"vnstatPath": "/path/to/vnstat",
 
 			// Optional, Allows you specify the directory of the vnstat, if it is not at the default location.
-			"vnstatDBDirectory": "",
+			"vnstatDBDirectory": "/path/to/database/directory",
 
 			// Required if remote server
-			"host": "",
-			"port": 22,
+			"host": 	"",
+			"port": 	22,
 			"username": "",
-			"password": ""
+			"password": "",
+
 		}
 	},
 
@@ -75,7 +78,7 @@ var config = module.exports = {
 		"protocol": "http://",
 		"host": 	"",
 		"port": 	8081,
-		"webRoot": 	"/tv",
+		"webRoot": 	"",
 		"apiKey": 	""
 	},
 
@@ -91,10 +94,10 @@ var config = module.exports = {
 
 	// Optional, Forecast.io Api
 	"weather": {
-		"apiKey": 	"",
-		"lat": 		"",
-		"long": 	"",
-		"useFahrenheit": true
+		"apiKey": 			"",
+		"lat": 				"",
+		"long": 			"",
+		"useFahrenheit": 	true
 	}
 };
 

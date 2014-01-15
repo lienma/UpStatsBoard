@@ -85,7 +85,7 @@ Plex.prototype.getPage = function(url, options) {
 
 		if(res.statusCode == 401) {
 			if(tokenCount == 1) {
-				var err = new Err('UNAUTHORIZED');
+				var err = new Error('UNAUTHORIZED');
 				err.reason = 'Plex token bad?';
 				return promise.reject(err);
 			} else {
@@ -94,11 +94,17 @@ Plex.prototype.getPage = function(url, options) {
 					request(resOptions, callback);
 
 				}).otherwise(function(reason) {
-					var err = new Err('UNAUTHORIZED');
+					var err = new Error('UNAUTHORIZED');
 					err.reason = reason;
 					return promise.reject(err);
 				});
 			}
+		}
+
+		if(res.statusCode == 404) {
+			var err = new Error('404_FILE_NOT_FOUND');
+			err.reason = '404 - ' + resOptions.uri;
+			return promise.reject(err);
 		}
 
 		promise.resolve(body);
@@ -195,7 +201,7 @@ Plex.prototype.getImage = function(options) {
 		if(options.height || options.width) {
 			imgOptions.height = options.height;
 			imgOptions.width = options.width;
-			url = '/photo/:/transcode?url=' + encodeURIComponent(this.getBaseUri() + location);
+			url = '/photo/:/transcode?url=' + encodeURIComponent('http://127.1:'+ this.port + location);
 			imgSize = '.' + imgOptions.height + 'x' + imgOptions.width;
 		}
 	}
@@ -225,7 +231,7 @@ Plex.prototype.getImage = function(options) {
 			}
 
 			promise.resolve(image);
-		});
+		}).otherwise(promise.reject);
 	}
 
 	fs.exists(file, function(exists) {

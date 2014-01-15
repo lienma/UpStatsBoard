@@ -1,20 +1,13 @@
 var request 		= require('request')
   , when 			= require('when');
 
+var CPU				= require('./../libs/Cpu')
+  , Memory 			= require('./../libs/Memory');
+
 exports.all = function(req, res) {
 
-	var waitingFunctions = [
-		getCpu(req),
-		getBandwidth(req),
-		getMemory(req),
-	];
-
-	when.all(waitingFunctions).then(function(results) {
-		res.json({
-			cpu: results[0],
-			bandwidth: results[1],
-			memory: results[2]
-		});
+	when.all([getCpu(req), getBandwidth(req), getMemory(req)]).then(function(data) {
+		res.json({ cpu: data[0], bandwidth: data[1], memory: data[2] });
 	});
 };
 
@@ -114,70 +107,6 @@ exports.weather = function(req, res) {
 	});
 };
 
-function getCPUInfo() {
-	var os = require('os');
-    var cpus = os.cpus();
-	var cpuData = [];
-
-	for(var i = 0, len = cpus.length; i < len; i++) {
-		var cpu = cpus[i], total = 0;
-		var cpuArray = {};
-
-		for(type in cpu.times)
-			total += cpu.times[type];
-
-		for(type in cpu.times) {
-			cpuArray[type] = cpu.times[type];
-		}
-		cpuArray.total = total;
-		cpuData.push(cpuArray);
-	}
-
-	return cpuData;
-}
-
-
-function getAvgCPU(oldCpus, newCpus, avgType) {
-	var average = 0;
-	for(var i = 0, len = oldCpus.length; i < len; i++) {
-		for(type in oldCpus[i]) {
-			if(type == avgType) {
-				var total = newCpus[i].total - oldCpus[i].total;
-				var difference = newCpus[i][type] - oldCpus[i][type];
-				var avg = Math.round(10000 * (difference / total)) / 100;
-				average += avg;
-			}
-		}
-	}
-	return Math.round(100 * average) / 100;
-}
-
-function getCpu() {
-	var promise 	= when.defer()
-	  , data 	= {}
-	  , os 			= require('os')
-	  , osUtils 	= require('os-utils');
-
-	var totalCPUs = os.cpus().length;
-	data.totalCPUs = totalCPUs;
-	data.cpu = os.cpus()[0].model;
-
-	var cpuNow = getCPUInfo();
-
-	setTimeout(function() {
-		var cpuLater = getCPUInfo();
-		data.user = getAvgCPU(cpuNow, cpuLater, 'user');
-		data.nice = getAvgCPU(cpuNow, cpuLater, 'nice');
-		data.sys = getAvgCPU(cpuNow, cpuLater, 'sys');
-		data.idle = getAvgCPU(cpuNow, cpuLater, 'idle');
-		data.time = new Date().getTime();
-		data.loadAvg = os.loadavg();
-		promise.resolve(data);
-	}, 5000);
-
-	return promise.promise;
-}
-
 function getBandwidth(req) {
 	var promise = when.defer()
 	  , bw = req.app.config.bandwidth;
@@ -197,27 +126,21 @@ console.log(reason);
 	return promise.promise;
 }
 
-function getMemory() {
-	var promise = when.defer();
+function getCpu() {
+	var promise 	= when.defer()
 
-	require('child_process').exec('free -m', function(error, stdout, stderr) {
-		var lines = stdout.split("\n");
-		var str_mem_info = lines[1].replace( /[\s\n\r]+/g,' ');
-		var str_swap_info = lines[3].replace( /[\s\n\r]+/g,' ');
-		var mem_info = str_mem_info.split(' ');
-		var swap_info = str_swap_info.split(' ');
-      
-		var bytes = Math.pow(1024, 2)
-		resJSON = {
-			total: 		parseFloat(mem_info[1]) * bytes,
-			free: 		parseFloat(mem_info[3]) * bytes,
-			buffer: 	parseFloat(mem_info[5]) * bytes,
-			cache: 		parseFloat(mem_info[6]) * bytes,
-			swap: 		parseFloat(swap_info[2]) * bytes
-		};
-		resJSON.used = (parseFloat(mem_info[2]) * bytes) - resJSON.buffer - resJSON.cache;
-		promise.resolve(resJSON);
+	CPU().then(function(data) {
+		promise.resolve(data);
 	});
 
 	return promise.promise;
-};
+}
+
+function getMemory(req) {
+	var promise = when.defer();
+	Memory(req).then(function(data) {
+		promise.resolve(data);
+	});
+
+	return promise.promise;
+}

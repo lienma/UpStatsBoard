@@ -73,10 +73,10 @@ function df(drive) {
 		var str_disk_info = lines[1].replace( /[\s\n\r]+/g,' ');
 		var disk_info = str_disk_info.split(' ');
 	
-		return formatResponse(drive, parseFloat(disk_info[2]) * 1024, parseFloat(disk_info[1]) * 1024);
+		return formatResponse(drive, parseFloat(disk_info[2]), parseFloat(disk_info[1]));
 	}
 
-	drive.command('df "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
+	drive.command('df --block-size=1 "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
 		var json = {err: reason.message, offline: true};
 
 		switch(reason.message) {
@@ -108,7 +108,7 @@ function du(drive) {
 		return formatResponse(drive, parseInt(find[0]) * 1024, drive.options.total);
 	}
 
-	drive.command('du -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
+	drive.command('du --block-size=1 -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
 		var json = {err: reason.message, offline: true};
 
 		switch(reason.message) {

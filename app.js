@@ -7,22 +7,31 @@ var express 		= require('express')
   , nib 			= require('nib')
   , http 			= require('http')
   , path 			= require('path')
+  , os 				= require('os')
   , expressUglify 	= require('express-uglify');
 
-var api 		= require('./routes/api')
-  , routes 		= require('./routes')
-  , stats 		= require('./routes/stats')
-  , config 		= require('./libs/Config')
-  , Logger 		= require('./libs/Logger');
+var api 			= require('./routes/api')
+  , routes 			= require('./routes')
+  , stats 			= require('./routes/stats')
+  , config 			= require('./libs/Config')
+  , Logger 			= require('./libs/Logger');
 
-var publicPath 	= path.join(__dirname, 'public')
-  , app 		= express();
-var server 		= http.createServer(app)
-  , logger 		= new Logger('MAIN_APP')
-  , envVal 		= process.env.NODE_ENV || 'development';
+var publicPath 		= path.join(__dirname, 'public')
+  , app 			= express();
 
-logger.info('Starting up app in ' + envVal + ' environment.');
+var server 			= http.createServer(app)
+  , logger 			= new Logger('MAIN_APP');
+
+if(os.type() == 'Windows_NT') {
+	console.log('UpsBoard only works on Linux operating system, and also Mac with limited features.');
+	process.exit(0);
+}
+
+logger.info('Starting up app in', (process.env.NODE_ENV) ? process.env.NODE_ENV : 'unknown', 'environment.');
 config().then(function(conf) {
+
+	app.isMacOs = (os.type() == 'Linux') ? false : true;
+
 	app.config = conf;
 
 	// all environments
@@ -30,41 +39,46 @@ config().then(function(conf) {
 	app.set('port', app.config.port);
 	app.set('views', path.join(__dirname, 'views'));
 	app.set('view engine', 'jade');
+
 	//app.use(app.config.webRoot, express.favicon());
-	app.use(express.urlencoded())
-	app.use(express.json())
+	app.use(express.urlencoded());
+	app.use(express.json());
 	app.use(express.methodOverride());
 
 	app.use(app.config.webRoot, stylus.middleware({src: publicPath, compile: function(str, path) {
 		return stylus(str).set('filename', path) .use(nib())
 	}}));
 
-	app.configure('development', function() {
-		app.locals.pretty = true;
-		app.use(express.responseTime());
-		app.use(express.logger('dev'));
-		app.use(app.config.webRoot, express.static(publicPath));
-		app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-	});
+	app.configure(function() {
+		if(conf.runningMode == 'normal') {
+			app.enable('trust proxy');
 
-	app.configure('production', function() {
-		app.enable('trust proxy');
+			if(app.config.logHttpRequests) {
+				app.use(express.logger());
+			}
 
-		if(app.config.logHttpRequests) {
-			app.use(express.logger());
+			function blankLog() {
+				this.log = function() {
+	
+				};
+			}
+
+			app.use(app.config.webRoot, expressUglify.middleware({ src: publicPath, logger: new blankLog() }));
+	
+			var oneYear = 31557600000;
+			app.use(app.config.webRoot, express.static(publicPath, { maxAge: oneYear }));
+			app.use(express.errorHandler());
+		} else {
+			app.locals.pretty = true;
+			app.use(express.responseTime());
+
+			if(app.config.logHttpRequests) {
+				app.use(express.logger('dev'));
+			}
+
+			app.use(app.config.webRoot, express.static(publicPath));
+			app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 		}
-
-		function blankLog() {
-			this.log = function() {
-
-			};
-		}
-
-		app.use(app.config.webRoot, expressUglify.middleware({ src: publicPath, logger: new blankLog() }));
-
-		var oneYear = 31557600000;
-		app.use(app.config.webRoot, express.static(publicPath, { maxAge: oneYear }));
-		app.use(express.errorHandler());
 	});
 
 	app.use(app.router);
@@ -73,6 +87,7 @@ config().then(function(conf) {
 	var webRoot = app.config.webRoot;
 
 	app.get(webRoot + '/', routes.index);
+
 	app.get(webRoot + '/install', routes.install);
 
 	app.get(webRoot + '/api/plex/currentlyWatching', api.plex.currentlyWatching);
@@ -96,7 +111,7 @@ config().then(function(conf) {
 	server.listen(app.get('port'), app.get('host'), function() {
 		var uri = app.get('host') + ':' + app.get('port') + app.config.webRoot;
 
-		logger.info('StatusBoard'.yellow, 'is running at',  uri.cyan);
+		logger.info('UpsBoard'.yellow, 'is running at',  uri.cyan);
 	});
 }).otherwise(function(reason) {
 
