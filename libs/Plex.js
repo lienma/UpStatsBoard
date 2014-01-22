@@ -201,7 +201,7 @@ Plex.prototype.getImage = function(options) {
 		if(options.height || options.width) {
 			imgOptions.height = options.height;
 			imgOptions.width = options.width;
-			url = '/photo/:/transcode?url=' + encodeURIComponent('http://127.1:'+ this.port + location);
+			url = '/photo/:/transcode?url=' + encodeURIComponent('http://127.0.0.1:'+ this.port + location);
 			imgSize = '.' + imgOptions.height + 'x' + imgOptions.width;
 		}
 	}
@@ -225,9 +225,7 @@ Plex.prototype.getImage = function(options) {
 	function getImage(dontWriteImage) {
 		self.getPage(url, imgOptions).then(function(image) {
 			if(!dontWriteImage) {
-				fs.writeFile(file, image, function(err) {
-
-				});
+				fs.writeFileSync(file, image);
 			}
 
 			promise.resolve(image);

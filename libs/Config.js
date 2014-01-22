@@ -11,7 +11,8 @@ var Bandwidth 	= require('./../libs/Bandwidth')
   , Plex 		= require('./../libs/Plex')
   , SickBeard 	= require('./../libs/SickBeard');
 
-var log 		= new (require('./../libs/Logger'))('CONFIG');
+var log 		= new (require('./../libs/Logger'))('CONFIG')
+  , Common 		= require('./../libs/Common');
 
 var appRoot 	= path.resolve(__dirname, '../')
   , cachePath 	= path.resolve(appRoot, 'cache');
@@ -133,13 +134,13 @@ function validateDrives(data) {
 			}
 
 			if(drive.total) {
-				if(!_.isNumber(drive.total)) {
+				var total = String(drive.total);
+				if(!Common.bytesRegEx.test(total)) {
 					var error = new Error('INVALID_CONFIG');
-					error.reason = 'Invalid total drive space for drive ' + label + ', needs to be a number';
+					error.reason = 'Invalid total drive space for drive ' + label + ', needs to be in the proper format';
 					return when.reject(error);
 				}
-
-				options.total = parseFloat(drive.total) * Math.pow(1024, 4);
+				options.total = Common.getBytes(total);
 			}
 
 			if(drive.icon) {

@@ -29,6 +29,12 @@
 			this.buildModules();
 			this.render();
 			this.fetch();
+
+			var self = this;
+			$('.bottom-bar-padding').css({height: this.$el.height() + 'px'});
+			$(window).on('resize', function() {
+				$('.bottom-bar-padding').css({height: self.$el.height() + 'px'});
+			});
 		},
 
 		buildModules: function() {

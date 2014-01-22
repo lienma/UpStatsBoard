@@ -1,21 +1,26 @@
-var when 			= require('when')
+var os 				= require('os')
+  , when 			= require('when')
   , _ 				= require('underscore');
 var Command 		= require('./../libs/Command')
   , Service 		= require('./../libs/Service')
   , log 			= new (require('./../libs/Logger'))('DRIVE_SPACE');
 
 var idCounter = 0;
-function Disk(label, location, options) {
+
+function Drive(label, location, options) {
 	idCounter += 1;
 
 	this._id = idCounter;
 
 	this.label = label;
 	this.location = location;
-	this.options = (options) ? options : {};
-	this.remote = (this.options.remote) ? this.options.remote : false;
-	var service = false;
 
+	_.defaults((options) ? options : {}, Drive.defaultOptions);
+	this.options = options;
+
+	this.remote = (this.options.remote) ? true : false;
+
+	var service = false;
 	if(this.remote) {
 		service = new Service(this.options.host, this.options.port, {username: this.options.username, password: this.options.password});
 	}
@@ -23,7 +28,19 @@ function Disk(label, location, options) {
 	this.command = Command(service);
 }
 
-Disk.prototype.getDriveSpace = function() {
+Drive.defaultOptions = {
+	remote: false,
+
+	total: 0,
+	icon: '',
+
+	host: '',
+	port: 22,
+	username: '',
+	password: ''
+};
+
+Drive.prototype.getDriveSpace = function() {
 	var self = this, promise = when.defer()
 	  , start = new Date().getTime();
 
@@ -50,14 +67,16 @@ Disk.prototype.getDriveSpace = function() {
 	return promise.promise;
 };
 
-Disk.prototype.getIcon = function() {
+Drive.prototype.getIcon = function() {
 	return (this.options && this.options.icon) ? this.options.icon : false;
 };
 
 function formatResponse(drive, used, total) {
+	var total = (drive.options.total && drive.options.total != 0) ? drive.options.total : total;
+	    total = (total) ? total : 0;
+
 	return {
 		_id: 		drive._id,
-		//location: 	drive.location,
 		label: 		drive.label,
 		icon: 		drive.getIcon(),
 		used: 		used,
@@ -70,13 +89,14 @@ function df(drive) {
 
 	function process(stdout) {
 		var lines = stdout.split('\n');
-		var str_disk_info = lines[1].replace( /[\s\n\r]+/g,' ');
-		var disk_info = str_disk_info.split(' ');
+		var str_drive_info = lines[1].replace( /[\s\n\r]+/g,' ');
+		var drive_info = str_drive_info.split(' ');
 	
-		return formatResponse(drive, parseFloat(disk_info[2]), parseFloat(disk_info[1]));
+		return formatResponse(drive, parseInt(drive_info[2]) * 1024, parseInt(drive_info[1]) * 1024);
 	}
 
-	drive.command('df --block-size=1 "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
+	var size = (os.type() == 'Linux') ? '--block-size=1024' : '-k';
+	drive.command('df ' + size + ' "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
 		var json = {err: reason.message, offline: true};
 
 		switch(reason.message) {
@@ -105,10 +125,11 @@ function du(drive) {
 
 	function process(stdout) {
 		var find = stdout.match(/(\d+)/);
-		return formatResponse(drive, parseInt(find[0]), drive.options.total);
+		return formatResponse(drive, parseInt(find[0]) * 1024);
 	}
 
-	drive.command('du --block-size=1 -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
+	var size = (os.type() == 'Linux') ? '--block-size=1024' : '-k';
+	drive.command('du ' + size + ' -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
 		var json = {err: reason.message, offline: true};
 
 		switch(reason.message) {
@@ -132,4 +153,4 @@ function du(drive) {
 	return promise.promise;
 }
 
-exports = module.exports = Disk;
+exports = module.exports = Drive;

@@ -8,23 +8,6 @@ var Command = require('./../libs/Command')
   , Service = require('./../libs/Service')
   , log 	= new (require('./../libs/Logger'))('BANDWIDTH');
 
-function getBytes(num, type) {
-	var power;
-	switch(type) {
-		case 'PiB':
-			power = 5;
-			break;
-		case 'TiB':
-			power = 4;
-			break;
-		case 'GiB':
-			power = 3;
-			break;
-	}
-	return Math.round(num * Math.pow(1024, power));
-}
-
-
 var globalId = 0;
 var Bandwidth = (function() {
 	return function(bwConfig) {

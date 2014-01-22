@@ -34,7 +34,7 @@ block content
 
   script(type='text/template')#tmpl-panel-recently-aired-show-item
     .poster
-      img(src!='<%= showPoster %>', title!='<%= showName %>')
+      img(src!='<%= showPoster %>', title!='<%= showName %>').pointer
 
   script(type='text/template')#tmpl-panel-recently-aired-show-popover 
     .watch-status.small
@@ -99,14 +99,10 @@ block content
         h1 <%= title %>:
       .progressDiv
 
-  script(type='text/template')#tmpl-bottom-service-item
-    a.btn.btn-xs
-      i.glyphicon
-
   script(type='text/template')#tmpl-panel-service-item
     td(style='padding-right:5px;').text-right <%= label %>
     td.text-left
-      a(style='width:65px;text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6)').btn.btn-xs
+      a(style='width:65px;text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6)', target='_blank').btn.btn-xs
         i(style='padding-right:1.4em;').glyphicon
         | <%= status %>
 
@@ -241,10 +237,10 @@ block content
           tr
             td
               .weather-alerts.hide
-                span.label.label-danger
+                span.label.label-danger.pointer
             td
               .weather-container
-                .tempature.text(data-tooltip-title='Click to see weather')
+                .tempature.text.pointer(data-tooltip-title='Click to see weather')
             td
               .clock-container
                 .clock.text
@@ -373,6 +369,7 @@ block content
               .panel-body.stat
                 ul.media-list
 
+  .bottom-bar-padding
   .bottom-display-bar
     .container
       .row

@@ -1,18 +1,18 @@
 !(function(App, $, _, Backbone) {
-	var RecentlyAddedMoviesModel = Backbone.Model.extend({
+	var Model = Backbone.Model.extend({
 		idAttribute: '_id'
 	});
 
-	var RecentlyAddedMoviesCollection = Backbone.Collection.extend({
-		model: RecentlyAddedMoviesModel,
+	var Collection = Backbone.Collection.extend({
+		model: Model,
 		url: App.Config.WebRoot + '/api/plex/recentlyAddedMovies'
 	});
 
-	var RecentlyAddedMoviesView = Backbone.View.extend({
+	var View = Backbone.View.extend({
 		el: 'div.panel.recentlyAddedMoviesPanel',
 
 		initialize: function() {
-			this.collection = new RecentlyAddedMoviesCollection();
+			this.collection = new Collection();
 			this.collection.on('add', this.addMovie, this);
 
 			var base = this;
@@ -26,6 +26,7 @@
 
 
 		addMovie: function(movie) {
+			var self = this;
 			this.slideCounter += 1;
 
 			var img = $('<img />', {'src': App.Config.WebRoot + '/api/plex/poster?location=' + encodeURIComponent(movie.get('movieThumbnail')) + '&width=300&height=500'})
@@ -33,6 +34,11 @@
 
 			movie.itemEl = $('<div />', {class: 'item' + ((this.slideCounter == 1) ? ' active' : '')}).append(img).append(caption);
 			this.$('.carousel-inner').append(movie.itemEl);
+
+			img.css({width: this.$('.carousel-inner').width() + 'px'});
+			$(window).resize(function() {
+				img.css({width: self.$('.carousel-inner').width() + 'px'});
+			});
 
 			if(this.slideCounter == this.collection.size()) {
 				this.startSlideshow();
@@ -45,5 +51,5 @@
 	});
 
 
-	App.View.Panel.RecentlyAddedMovies = RecentlyAddedMoviesView;
+	App.View.Panel.RecentlyAddedMovies = View;
 })(App, jQuery, _, Backbone);
