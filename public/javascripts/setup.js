@@ -35,7 +35,7 @@ define([
 			}, this);
 
 			this.generateSteps();
-			this.Wizard.setDefaults(defaultData);
+			this.Wizard.setDefaults({}});
 
 			this.renderAll();
 			this.Wizard.openAt('stats/service');
