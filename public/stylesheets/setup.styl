@@ -1,0 +1,309 @@
+.ui-effects-wrapper
+	display inline
+
+.normal
+	font-weight normal
+
+.bold
+	font-weight bold
+
+.bold-center
+	text-align center
+	font-weight bold
+
+.no-margin
+	margin 0 !important
+
+	.form-control-no-margin
+		padding-right 23.5px !important
+
+	.form-control-feedback
+		right 0 !important
+
+.servers-drives.has-no-cpu
+	th:nth-child(3), td:nth-child(3)
+		background-color #f2dede
+		border-top 0
+		border-left solid 1px #dca7a7
+		border-right solid 1px #dca7a7
+		color #a94442
+	th:nth-child(3)
+		border-top solid 1px #dca7a7 !important
+		border-bottom 0
+	tr:last-child
+		td:nth-child(3)
+			border-bottom solid 1px #dca7a7
+
+.servers-drives.has-no-memory
+	th:nth-child(4), td:nth-child(4)
+		background-color #f2dede
+		border-top 0
+		border-left solid 1px #dca7a7
+		border-right solid 1px #dca7a7
+		color #a94442
+	th:nth-child(4)
+		border-top solid 1px #dca7a7 !important
+		border-bottom 0
+	tr:last-child
+		td:nth-child(4)
+			border-bottom solid 1px #dca7a7
+
+.servers-drives.has-no-drives
+	th:nth-child(6), td:nth-child(6)
+		background-color #f2dede
+		border-top 0
+		border-left solid 1px #dca7a7
+		border-right solid 1px #dca7a7
+		color #a94442
+	th:nth-child(6)
+		border-top solid 1px #dca7a7 !important
+		border-bottom 0
+	tr:last-child
+		td:nth-child(6)
+			border-bottom solid 1px #dca7a7
+
+
+.form-group
+	margin-bottom 10px
+
+.help-block
+	margin-bottom 0
+	margin-top 2px
+
+.help-block-checkbox
+	margin-top 2px
+
+.no-services-added-yet
+	padding 10px
+
+.btn-inline-msg
+	padding-left 10px
+
+.services-list
+	li
+		list-style none
+
+ul.tooltip-errors-list
+	padding-left 10px
+	margin-bottom 0
+	> li
+		text-align left
+
+
+.service-item
+	padding 2px
+
+	a, button
+		text-shadow 0 1px 1px rgba(0, 0, 0, 0.6)
+
+	button
+		padding 5px
+
+	button.service-label
+		padding 5px 20px
+
+	i.service-status
+		padding-right 5px
+
+	i.service-delete2
+		padding-left 10px
+
+.service-item.min
+	float left
+
+.service-item.full
+	i
+		padding-right 5px
+
+.modal#plexModalSelectLibrary
+	.modal-body
+		.modal-plex-libraries-container
+			height 200px
+			overflow auto
+
+			.modal-plex-libraries-list
+				padding-left 0
+
+				li:nth-of-type(odd)
+					.modal-plex-library-container
+						background-color #f9f9f9
+				li
+					list-style none
+					padding-left 5px
+					padding-right 5px
+
+					.modal-plex-library-container:hover
+						background-color #eee
+
+					.modal-plex-library-container
+						display table
+						width 100%
+						padding-left 10px
+						padding-right 10px
+						border-top 1px solid #ddd
+
+						.modal-plex-library-select
+							float right
+							margin-top 5px
+
+						small
+							padding-left 10px
+.wizard
+	.wizard-tabs
+		margin 0
+		padding 0
+		clear both
+		border-bottom 1px solid #c2c2c2
+		background url(../images/wizard-bg.png)
+
+		.btn-tab-item
+			cursor pointer
+			color #959595
+			text-shadow 0 1px 0 #fff
+			line-height inherit
+			font-size 12px
+			font-weight bold
+			padding 9.5px 15px
+			padding-left 30px
+			margin: -1px
+			background url(../images/wizard-bg-normal.png)
+			border 1px solid #ddd
+			border-left none
+			border-right none
+			border-radius 0
+			text-decoration none
+
+		.btn-tab-item:after
+			display block
+			content ' '
+			position absolute
+			height 35px
+			width 16px
+			right -15px
+			top -1px
+			background url(../images/wizard-arrow-normal.png)
+			z-index 1
+
+		.btn-tab-item:first-child
+			padding-left 15px
+
+		.btn-tab-item:hover, .btn-tab-item:active, .btn-tab-item:focus
+			z-index inherit
+
+		.btn-tab-item.bti-disabled
+			cursor not-allowed!important
+
+		.btn-tab-item.bti-current
+			background url(../images/wizard-bg-current.png)
+			border-color #225289
+
+		.btn-tab-item.bti-error
+			background url(../images/wizard-bg-error.png)
+			border-color #5f2424
+
+		.btn-tab-item.bti-success
+			background url(../images/wizard-bg-success.png)
+			border-color #3e6638
+			color #22481d
+			text-shadow 0 1px 0 #c3f1c3
+
+		.btn-tab-item.bti-warning
+			background url(../images/wizard-bg-warning.png)
+			border-color #533002
+
+		.btn-tab-item.bti-current, .btn-tab-item.bti-error, .btn-tab-item.bti-warning
+			color #fff
+			text-shadow 0 1px 0 #000
+
+		.btn-tab-item.bti-current:after
+			background url(../images/wizard-arrow-current.png)
+
+		.btn-tab-item.bti-error:after
+			background url(../images/wizard-arrow-error.png)
+
+		.btn-tab-item.bti-success:after
+			background url(../images/wizard-arrow-success.png)
+
+		.btn-tab-item.bti-warning:after
+			background url(../images/wizard-arrow-warning.png)
+
+		.btn-tab-item:last-child:after
+			background none!important
+
+	.wizard-select-services
+		padding-bottom 10px
+		text-align center
+
+		.wizard-select-service
+			display inline-block
+			padding 10px
+			border 1px solid #ddd
+			border-radius 20px
+			line-height normal
+			cursor pointer
+			margin 10px
+
+		.wizard-select-service-selected
+			background-color #ddd
+			border 1px solid #c2c2c2
+
+	.wizard-sub-tabs
+		margin-top 10px
+
+		a
+			padding 10px
+
+		.wizard-sub-title
+			float left
+			height 42px
+			padding 15px 20px
+			padding-left 0
+			font-size 15px
+			font-weight bold
+			line-height 20px
+
+		.wizard-sub-tabs-success, .wizard-sub-tabs-success:focus, .wizard-sub-tabs-success:hover
+			color #3c763d
+		.wizard-sub-tabs-error, .wizard-sub-tabs-error:focus, .wizard-sub-tabs-error:hover
+			color #a94442
+
+		.wizard-sub-tabs-title
+			margin-left 5px
+			margin-right 5px
+
+	.wizard-sub-content
+		padding-left 10px
+		padding-right 10px
+
+
+		.row-continue
+			margin-left -20px
+			margin-right -20px
+
+	.content > *
+		display none
+
+	.content > *:first-child, .content > *:nth-child(2)
+		display block
+
+	.panel-body
+		padding-top 0
+
+		.step-title
+			border-bottom 1px solid #ddd
+
+	.row-continue
+		border-top 1px solid #ddd
+		padding-top 5px
+		padding-left 20px
+		padding-right 20px
+
+		.row-btn-inline
+			display inline
+
+		.btn-pervious-page
+			width 120px
+
+		.btn-next-page
+			margin-left 10px
+			width 120px

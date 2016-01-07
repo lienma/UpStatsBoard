@@ -1,0 +1,24 @@
+extends ../layout
+
+block stylesheet
+  link(rel='stylesheet', href=locals.webRoot + '/stylesheets/setup.css?' + locals.seed)
+
+block script
+  script(type='text/javascript') Config.uuid = '#{locals.uuid}';
+  script(type='text/javascript') Config.setup = { host: '#{locals.host}', port: #{locals.port}, webRoot: '#{locals.webRoot}' };
+
+  script(type='text/javascript') require(['#{locals.webRoot}/javascripts/config.js'], function(config) { require(['setup'], function(setup) { new setup(); }); });
+
+block content
+  .container#SetupWizard
+    .row
+      .h1 UpsBoard Setup Guide
+
+    .row
+      .panel.panel-default.wizard
+        .panel-heading
+          h4.panel-title Welcome to the setup guide for the UpsBoard App
+        div
+          .btn-group.btn-group-justified.wizard-tabs(role='group', aria-label='Navigation Bar')
+
+        .panel-body

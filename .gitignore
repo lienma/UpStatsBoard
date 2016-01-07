@@ -1,0 +1,7 @@
+.cache
+/cache
+/database
+/logs
+/node_modules
+config.ini
+upsboard.db

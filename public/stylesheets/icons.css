@@ -1,0 +1,70 @@
+.icos {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+}
+.icos.icos-16 {
+  height: 16px;
+  width: 16px;
+}
+.icos.icos-72 {
+  height: 72px;
+  width: 72px;
+}
+.icos.icos-16.icos-server-stats {
+  background: url("../images/icon-server-stats-16.png");
+}
+.icos.icos-16.icos-service-online {
+  background: url("../images/icon-service-online-16.png");
+}
+.icos.icos-16.icos-couchpotato {
+  background: url("../images/favicon-couchpotato.png");
+}
+.icos.icos-16.icos-download-center {
+  background: url("../images/icon-download-center-16.png");
+}
+.icos.icos-16.icos-headphones {
+  background: url("../images/icon-headphones-16.png");
+}
+.icos.icos-16.icos-nzbget {
+  background: url("../images/favicon-nzbget.ico");
+}
+.icos.icos-72.icos-nzbget {
+  background: url("../images/icon-nzbget-72.png");
+}
+.icos.icos-16.icos-plex {
+  background: url("../images/icon-plex-16.png");
+}
+.icos.icos-72.icos-plex {
+  background: url("../images/icon-plex-72.png");
+}
+.icos.icos-16.icos-plex-monitor {
+  background: url("../images/icon-plex-16.png");
+}
+.icos.icos-16.icos-plexpy {
+  background: url("../images/icon-plexpy-16.png");
+}
+.icos.icos-16.icos-sabnzbd {
+  background: url("../images/favicon-sabnzbd.ico");
+}
+.icos.icos-72.icos-sabnzbd {
+  background: url("../images/icon-sabnzbd-72.png");
+}
+.icos.icos-16.icos-servers {
+  background: url("../images/icon-servers-16.png");
+}
+.icos.icos-16.icos-sickbeard {
+  background: url("../images/icon-sickbeard-16.png");
+}
+.icos.icos-72.icos-sickbeard {
+  background: url("../images/icon-sickbeard-72.png");
+}
+.icos.icos-16.icos-sonarr {
+  background: url("../images/icon-sonarr-16.png");
+}
+.icos.icos-72.icos-sonarr {
+  background: url("../images/icon-sonarr-72.png");
+}
+.icos.icos-16.icos-weather {
+  background: url("../images/icon-weather-16.png");
+}

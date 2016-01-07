@@ -1,0 +1,15 @@
+extends ../layout
+
+block stylesheet
+  link(rel='stylesheet', href=locals.webRoot + '/stylesheets/setup.css?' + locals.seed)
+
+block script
+  script(type='text/javascript') Config.uuid = '#{locals.uuid}';
+  script(type='text/javascript') Config.setup = { host: '#{locals.host}', port: #{locals.port}, webRoot: '#{locals.webRoot}' };
+
+  script(type='text/javascript') require(['#{locals.webRoot}/javascripts/config.js'], function(config) { require(['setup'], function(setup) { new setup(); }); });
+
+block content
+  .container
+    .row
+      .h1 Welcome to UpsBoard Landing Page

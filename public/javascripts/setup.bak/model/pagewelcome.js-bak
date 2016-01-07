@@ -1,0 +1,5 @@
+define(['setup/model/pagebase'], function(ModelBase) {
+
+	return function() 
+
+});
