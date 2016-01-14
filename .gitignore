@@ -1,7 +1,9 @@
+/build
 .cache
 /cache
 /database
 /logs
 /node_modules
+/bower_components
 config.ini
 upsboard.db

@@ -50,6 +50,7 @@ function setupMiddleware(upsboardApp) {
 	if(upsboardApp.get('env') !== 'development') {
 		upsboardApp.use(minify());
 		upsboardApp.use(serveStatic(paths.public, { maxAge: 31557600000 }));
+		upsboardApp.use(serveStatic(paths.build, { maxAge: 31557600000 }));
 		upsboardApp.use(errorHandler());
 	} else {
 		upsboardApp.set({'Cache-Control': 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0'});
@@ -59,6 +60,7 @@ function setupMiddleware(upsboardApp) {
 		upsboardApp.use(responseTime());
 
 		upsboardApp.use(serveStatic(paths.public));
+		upsboardApp.use(serveStatic(paths.build));
 		upsboardApp.use(errorHandler({ dumpExceptions: true, showStack: true }));
 	}
 

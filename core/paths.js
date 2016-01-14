@@ -4,6 +4,7 @@ var appRoot		= path.resolve(__dirname, '../');
 var paths = module.exports = {
 	app         : appRoot,
 
+	build       : path.join(appRoot, 'build'),
 	cache       : path.join(appRoot, 'cache'),
 	cfg_file    : path.join(appRoot, 'config.ini'),
 	controllers : path.join(appRoot, 'core', 'controllers'),

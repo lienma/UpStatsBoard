@@ -4,14 +4,38 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "build": "grunt build"
+  },
+  "browser": {
+    "jquery": "./bower_components/jquery/dist/jquery.js",
+    "underscore": "./bower_components/underscore/underscore.js",
+    "backbone": "./bower_components/backbone/backbone.js",
+    "bootstrap": "./bower_components/bootstrap/dist/js/bootstrap.js"
+  },
+  "browserify": {
+    "transform": [
+      "jadeify",
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "jquery": "$",
+    "bootstrap": {
+      "exports": "bootstrap",
+      "depends": [
+        "jquery:$"
+      ]
+    }
   },
   "dependencies": {
+    "backbone": "^1.2.3",
     "bcrypt-nodejs": "0.0.3",
     "bcryptjs": "^2.3.0",
     "bluebird": "^3.0.2",
     "body-parser": "^1.14.1",
     "bookshelf": "^0.8.2",
+    "bootstrap": "^3.3.6",
     "chalk": "^1.1.1",
     "colors": "1.1.*",
     "cookie-parser": "^1.4.0",
@@ -23,6 +47,7 @@
     "include-all": "^0.1.6",
     "ini": "^1.3.4",
     "jade": "^1.11.0",
+    "jquery": "^2.2.0",
     "knex": "^0.8.6",
     "lodash": "^3.10.1",
     "method-override": "^2.3.5",
@@ -37,8 +62,18 @@
     "socket.io": "^1.3.7",
     "ssh2": "^0.4.12",
     "stylus": "^0.52.4",
-    "underscore": "1.8.*",
+    "underscore": "^1.8.3",
     "winston": "^2.1.0",
     "xml2js": "^0.4.13"
+  },
+  "devDependencies": {
+    "babel-core": "^6.4.0",
+    "babel-preset-es2015": "6.1.x",
+    "babelify": "7.2.x",
+    "browserify": "^13.0.0",
+    "browserify-shim": "^3.8.12",
+    "gulp": "^3.9.0",
+    "gulp-eslint": "^1.1.1",
+    "jadeify": "^4.6.0"
   }
 }

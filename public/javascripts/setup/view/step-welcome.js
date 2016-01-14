@@ -3,7 +3,7 @@ define([
 
 	'setup/view/step-base',
 
-	'tmpl!setup/step-welcome'
+	'template/step-welcome.jade'
 ], function (Backbone, StepBase, TmplWelcome) {
 
 	return StepBase({
