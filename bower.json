@@ -1,0 +1,25 @@
+{
+  "name": "UpsBoard",
+  "description": "Usenet + Plex + Stats Board, allows you to monitor your usenet services (SABnzbd+, Sonarr, Sick Beard, & CouchPotato), Plex Media Server, & your servers/computers (CPU Usage, Memory Usage, Bandwidth Usage, & Disk Space Usage).",
+  "main": "main.js",
+  "authors": [
+    "Matthew Lien <lienma@users.noreply.github.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/lienma/UpStatsBoard",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.2.0",
+    "underscore": "~1.8.3",
+    "backbone": "~1.2.3",
+    "bootstrap": "~3.3.6"
+  }
+}
