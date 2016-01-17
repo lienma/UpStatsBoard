@@ -300,14 +300,19 @@ ul.tooltip-errors-list > li {
 .wizard .panel-body .step-title {
   border-bottom: 1px solid #ddd;
 }
+.wizard .bottom-btn-row {
+  padding-top: 5px;
+}
+.wizard .row-btn-inline {
+  display: inline-block;
+  line-height: 34px;
+  padding-left: 10px;
+}
 .wizard .row-continue {
   border-top: 1px solid #ddd;
   padding-top: 5px;
   padding-left: 20px;
   padding-right: 20px;
-}
-.wizard .row-continue .row-btn-inline {
-  display: inline;
 }
 .wizard .row-continue .btn-pervious-page {
   width: 120px;

@@ -1,12 +1,12 @@
 import $           from 'jquery';
-import Backbone    from 'backbone';
 import _           from 'underscore';
+import Backbone    from 'backbone';
 import TabItemView from './tab-item';
 
 class BasePane extends Backbone.View {
 	get id() { return this.model.id; }
-	get isCurrent() { return this.model.isCurrent(); }
-	get isDisabled() { return this.model.isDisabled(); }
+	get isCurrent() { return this.model.isCurrent; }
+	get isDisabled() { return this.model.isDisabled; }
 	get getCurrentTab() { return this._body.getTab(this._currentSubTab); }
 	get tagName() { return 'div'; }
 
@@ -34,7 +34,7 @@ class BasePane extends Backbone.View {
 	close(callback) {
 		$(this._body.$el).slideUp({ complete: () => {
 			this._body.validate();
-			if(!this.model.hasErrors()) {
+			if(!this.model.hasErrors) {
 				this.set('success', true);
 			}
 			this.set('current', false);
@@ -53,6 +53,10 @@ class BasePane extends Backbone.View {
 		$(this._body.$el).slideDown({ complete: () => {
 			this.set('hasOpened', true);
 			callback();
+
+			if(_.isFunction(this._body.afterOpen)) {
+				this._body.afterOpen();
+			}
 
 			if(this._body.hasSubTabs()) {
 				this.wizard.Router.navigate(this.id + '/' + this._currentSubTab);

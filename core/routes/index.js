@@ -10,6 +10,7 @@ module.exports = {
 		'plex': {
 			'post auth'      : 'SetupPlexController.auth',
 			'post libraries' : 'SetupPlexController.libraries',
+			'post plexpy'    : 'SetupPlexController.plexpy',
 			'post test'      : 'SetupPlexController.test'
 		},
 		'server': {

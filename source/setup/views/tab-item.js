@@ -44,17 +44,17 @@ class TabItemView extends Backbone.View {
 		let link = this.$el;
 
 		this.resetClass();
-		if(this.model.isCurrent()) {
+		if(this.model.isCurrent) {
 			link.addClass('bti-current');
-		} else if(this.model.isSuccessful()) {
+		} else if(this.model.isSuccessful) {
 			link.addClass('bti-success');
-		} else if(this.model.hasErrors()) {
+		} else if(this.model.hasErrors) {
 			link.addClass('bti-error');
 		}
 	}
 
 	updateErrorsTooltip() {
-		if(this.model.hasErrors()) {
+		if(this.model.hasErrors) {
 			let msgs = ['<b>This page contains errors:</b><ul class="tooltip-errors-list">'];
 			this.model.errors.forEach((model) => {
 				msgs.push('<li>' + model.get('msg') + '</li>');

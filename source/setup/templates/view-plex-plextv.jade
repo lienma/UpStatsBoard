@@ -1,0 +1,18 @@
+form.form-horizontal
+  .row
+    .col-md-12
+      h4.step-title Plex.tv Account Credentials
+      .form-group
+        label(for='plexTvUsername').col-sm-2.control-label Username
+        .col-sm-8
+          input(type='text', placeholder='Username', aria-describedby='plexTvUsernameHelp').form-control.plex-tv-account#plexTvUsername
+          span.help-block#plexTvUsernameHelp Your username for your Plex.tv account.
+      .form-group
+        label(for='plexTvPassword').col-sm-2.control-label Password
+        .col-sm-8
+          input(type='password', placeholder='Password', aria-describedby='plexTvPasswordHelp').form-control.plex-tv-account#plexTvPassword
+          span.help-block#plexTvPasswordHelp Your password for your Plex.tv account.
+      .form-group
+        .col-sm-8.col-sm-push-2
+          button(role='button', disabled, data-loading-text='Loading', autocomplete='off').btn.btn-default.btn-sm.btn-plex-tv-authenication Authenicate with Plex.tv
+          span.btn-inline-msg.btn-plex-tv-authenication-msg

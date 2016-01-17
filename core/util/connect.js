@@ -175,7 +175,7 @@ console.log('driveData', driveData);
 			if(isNaN(driveData.used)) {
 
 			} else {
-				return driveData;
+				return resolve(driveData);
 			}
 		}).catch(function (err) {
 			console.log(chalk.red(err), err);
@@ -194,10 +194,10 @@ console.log('driveData', driveData);
 			var str_drive_info = lines[1].replace( /[\s\n\r]+/g,' ');
 			var drive_info = str_drive_info.split(' ');
 
-			resolve({
+			return {
 				used: parseInt(drive_info[2]) * 1024,
 				total: parseInt(drive_info[1]) * 1024
-			})
+			};
 		});
 	}
 };

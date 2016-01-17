@@ -1,0 +1,52 @@
+form.form-horizontal
+  .row
+    .col-md-12
+      h4.step-title Plex Media Server Settin
+      .form-group
+        label(for='plexMediaServerHost').col-sm-2.control-label IP/Host Address
+        .col-sm-8
+          input(type='text', placeholder='IP/Host Address', aria-describedby='plexMediaServerHostHelp').form-control.plex-media-server#plexMediaServerHost
+          span.help-block#plexMediaServerHostHelp The IP Address or Host Address of the Plex Media Server.
+      .form-group
+        label(for='plexMediaServerPortNumber').col-sm-2.control-label Port Number
+        .col-sm-8
+          input(type='number', placeholder='Port Number', aria-describedby='plexMediaServerPortNumberHelp', size=5).form-control.plex-media-server#plexMediaServerPortNumber
+          span.help-block#plexMediaServerPortNumberHelp Port number that Plex Media Server is running on.
+            small Note: Default port number for Plex Media Server is 32400.
+      .form-group
+        label(for='plexMediaServerSSLEnable').col-sm-2.control-label Use SSL/HTTPS
+        .col-sm-8.checkbox
+          label
+            input(type='checkbox', aria-describedby='plexMediaServerSSLEnableHelp').checkboxEnable#plexMediaServerSSLEnable
+            span.help-block.help-block-checkbox Enabled
+          span.help-block#plexMediaServerSSLEnableHelp Use if you have SSL enabled on your Plex Media Server.
+      .form-group
+        .col-sm-8.col-sm-push-2
+          button(role='button', disabled).btn.btn-default.btn-sm.btn-plex-text-connection Test Connection To Media Server
+          span.btn-inline-msg.btn-plex-text-connection-msg
+      .form-group
+        label(for='plexDefaultMovie').col-sm-2.control-label Default Movie Library ID
+        .col-sm-8
+          input(type='number', placeholder='Default Movie Library ID', aria-describedby='plexDefaultMovieHelp', size=5, data-model-field='plexDefaultMovie', data-model-validate='DefaultMovie').form-control#plexDefaultMovie
+          span.help-block#plexDefaultMovieHelp The ID of your default movie library. 
+            button(role='button', data-type='movie', data-field='plexDefaultMovie', disabled).btn.btn-default.btn-xs.btn-plex-pick-library.btn-plex-pick-movie Click here to pick library.
+      .form-group
+        label(for='plexDefaultTVShow').col-sm-2.control-label Default TV Show Library ID
+        .col-sm-8
+          input(type='number', placeholder='Default TV Show Library ID', aria-describedby='plexDefaultTVShowHelp', size=5, data-model-field='plexDefaultTVShow', data-model-validate='DefaultTVShow').form-control#plexDefaultTVShow
+          span.help-block#plexDefaultTVShowHelp The ID of your default tv show library. 
+            button(role='button', data-type='show', data-field='plexDefaultTVShow', disabled).btn.btn-default.btn-xs.btn-plex-pick-library.btn-plex-pick-tv-show Click here to pick library.
+      .form-group
+        label(for='plexDefaultMusic').col-sm-2.control-label Default Music Library ID 
+          small (Optional)
+        .col-sm-8
+          input(type='number', placeholder='Default Music Library ID', aria-describedby='plexDefaultMusicHelp', size=5, data-model-field='plexDefaultMusic', data-model-validate='DefaultMusic').form-control#plexDefaultMusic
+          span.help-block#plexDefaultMusicHelp The ID of your default music library. 
+            button(role='button', data-type='artist', data-field='plexDefaultMusic', disabled).btn.btn-default.btn-xs.btn-plex-pick-library.btn-plex-pick-tv-show Click here to pick library.
+       .form-group
+        label(for='plexMediaServerUseBIF').col-sm-2.control-label Use Video Preview Thumbnails (BIF)
+        .col-sm-8.checkbox
+          label
+            input(type='checkbox', aria-describedby='plexMediaServerUseBIFHelp', data-model-field='plexUseBIF').checkboxEnable#plexMediaServerUseBIF
+            span.help-block.help-block-checkbox Enabled
+          span.help-block#plexMediaServerUseBIFHelp If you have media indexing enabled on your server, use these on the activity pane.

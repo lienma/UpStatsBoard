@@ -20,6 +20,7 @@
     "jquery": "~2.2.0",
     "underscore": "~1.8.3",
     "backbone": "~1.2.3",
-    "bootstrap": "~3.3.6"
+    "bootstrap": "~3.3.6",
+    "numeral": "numeraljs#~1.5.3"
   }
 }

@@ -5,7 +5,8 @@ var appRoot    = path.resolve(__dirname, '../../')
   , paths      = require(appRoot + '/core/paths');
 
 
-var Plex       = require(paths.modules + '/plex');
+var Plex       = require(paths.modules + '/plex')
+  , PlexPy     = require(paths.modules + '/plexpy');
 
 
 module.exports = function SetupPlexController (app) {
@@ -36,9 +37,50 @@ module.exports = function SetupPlexController (app) {
 				clientId: app.get('clientId')
 			});
 
-			plex.getLibraries().then(function(libraries) {
+			plex.getLibraries().then(function (libraries) {
 				res.json({ libraries: libraries });
 			}).catch(res.json);
+		},
+
+		'plexpy': function (req, res) {
+			var plexPy = new PlexPy({
+				host    : req.body.host,
+				port    : parseInt(req.body.port),
+				webRoot : req.body.webRoot,
+				apiKey  : req.body.apiKey,
+				useSSL  : (req.body.useSSL == 'true') ? true : false
+			});
+
+
+			plexPy.ping()
+				.then(function (data) {
+console.log('data', data)
+					if(data.wrongApiKey) {
+						return res.json({ connection: false, wrongApiKey: true });
+					}
+
+					if(data.apiError) {
+						return res.json({ connection: false, apiError: true, errorMsg: data.apiError });
+					}
+
+					return res.json({ connection: true });
+				})
+				.catch(function (error) {
+console.log(error);
+					switch(error.message) {
+						case 'RETURN_NOT_200':
+							return res.json({ connection: false, pathNotFound: true });
+						case 'REQUEST_ERROR':
+							switch(error.error.code) {
+								case 'ENOTFOUND':
+									return res.json({ connection: false, hostNotFound: true });
+								case 'ECONNREFUSED':
+									return res.json({ connection: false, connectionRefused: true });
+							}
+					}
+
+					return res.json({connection: false, failed: true});
+				});
 		},
 
 		'test': function (req, res) {

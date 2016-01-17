@@ -8,19 +8,33 @@
     "build": "grunt build"
   },
   "browser": {
-    "jquery": "./bower_components/jquery/dist/jquery.js",
-    "underscore": "./bower_components/underscore/underscore.js",
     "backbone": "./bower_components/backbone/backbone.js",
-    "bootstrap": "./bower_components/bootstrap/dist/js/bootstrap.js"
+    "bootstrap": "./bower_components/bootstrap/dist/js/bootstrap.js",
+    "jquery": "./bower_components/jquery/dist/jquery.js",
+    "jquery-ui": "./source/vendors/jquery-ui/jquery-ui-custom-1.11.4.js",
+    "numeral": "./bower_components/numeral/numeral.js",
+    "underscore": "./bower_components/underscore/underscore.js"
   },
   "browserify": {
     "transform": [
-      "jadeify",
+      [
+        "jadeify",
+        {
+          "compileDebug": true,
+          "pretty": true
+        }
+      ],
       "browserify-shim"
     ]
   },
   "browserify-shim": {
     "jquery": "$",
+    "jquery-ui": {
+      "exports": "jqueryui",
+      "depends": [
+        "jquery:$"
+      ]
+    },
     "bootstrap": {
       "exports": "bootstrap",
       "depends": [
@@ -73,7 +87,11 @@
     "browserify": "^13.0.0",
     "browserify-shim": "^3.8.12",
     "gulp": "^3.9.0",
+    "gulp-connect": "^2.3.1",
     "gulp-eslint": "^1.1.1",
-    "jadeify": "^4.6.0"
+    "gulp-livereload": "^3.8.1",
+    "gulp-util": "^3.0.7",
+    "jadeify": "^4.6.0",
+    "vinyl-source-stream": "^1.1.0"
   }
 }

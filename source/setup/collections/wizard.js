@@ -1,9 +1,9 @@
-import _           from 'underscore';
-import Backbone    from 'backbone';
-import ModelWizard from '../models/wizard'
+import _        from 'underscore';
+import Backbone from 'backbone';
+import ModelTab from '../models/tab'
 
 class Collection extends Backbone.Collection {
-	get model() { return ModelWizard; }
+	get model() { return ModelTab; }
 
 	initialize() {
 		this._current = null;

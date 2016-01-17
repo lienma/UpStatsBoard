@@ -10,7 +10,7 @@ var appRoot = path.resolve(__dirname, '../../')
 
 var log 	= require(paths.logger)('SONARR');
 
-function Sonarr(config) {
+function Sonarr (config) {
 
 
 	var protocol = config.useSSL ? 'https://' : 'http://';
@@ -23,12 +23,12 @@ function Sonarr(config) {
 	this.apiKey 	= config.apiKey;
 }
 
-Sonarr.prototype.getPage = function(cmd, filters) {
+Sonarr.prototype.getPage = function (cmd, filters) {
 	var url = this.url + 'api/' + cmd;
 	log.debug('Calling Sonarr page:', chalk.cyan(url));
 
-	return new Promise(function(resolve, reject) {
-		request.getAsync({ rejectUnauthorized: false, uri: url, headers: { 'x-api-key': this.apiKey }, json: true }).then(function(response) {
+	return new Promise(function (resolve, reject) {
+		request.getAsync({ rejectUnauthorized: false, uri: url, headers: { 'x-api-key': this.apiKey }, json: true }).then(function (response) {
 			var body = response.body;
 
 			if(response.statusCode != 200 && response.statusCode != 401) {
@@ -44,7 +44,7 @@ Sonarr.prototype.getPage = function(cmd, filters) {
 				if(body.error && body.error == 'Unauthorized') {
 					resolve({ wrongApiKey: true });
 				} else if(body.error) {
-					resolve({ apiError: true, errorMsg: body.error})
+					resolve({ apiError: true, errorMsg: body.error });
 				} else {
 					resolve(body);
 				}
@@ -54,7 +54,7 @@ Sonarr.prototype.getPage = function(cmd, filters) {
 				errReturn.body = body;
 				reject(errReturn);
 			}
-		}).catch(function(error) {
+		}).catch(function (error) {
 			var errReturn = new Error('REQUEST_ERROR');
 			errReturn.error = error;
 			errReturn.url = url;
@@ -63,7 +63,7 @@ Sonarr.prototype.getPage = function(cmd, filters) {
 	});
 };
 
-Sonarr.prototype.ping = function() {
+Sonarr.prototype.ping = function () {
 	return this.getPage('system/status');
 };
 

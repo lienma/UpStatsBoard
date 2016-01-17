@@ -1,4 +1,3 @@
-import $        from 'jquery';
 import _        from 'underscore';
 import Backbone from 'backbone';
 
@@ -53,7 +52,7 @@ class Validator {
 
 	getElement(id) {
 		let data = this.dataSchema[id];
-		return this.body.find((data.el) ? data.el : '#' + id);
+		return $(this.body.find((data.el) ? data.el : '#' + id));
 	}
 
 	getValue(id) {
@@ -67,15 +66,16 @@ class Validator {
 	}
 
 	renderDefaults() {
-		_.each(this.dataSchema, (data, id) => {
-			this.setValue(id, data.default);
-		});
+		_.each(this.dataSchema, (data, id) => this.setValue(id, data.default) );
 	};
 
 	setDataSchema(dataSchema) {
 		_.each(dataSchema, (data, id) => {
 			this._fieldIsvalid[id] = false;
 			this.bindToElement(data, id);
+
+			var defaultValue = (data.default) ? data.default : '';
+			this.trigger('update', id, defaultValue, true);
 		});
 
 		this.dataSchema = dataSchema;
@@ -151,7 +151,7 @@ throw new Error('ID not found')
 
 		if(!_.isObject(constraints)) return updateEvent();
 		if(value === '' && !_.has(constraints, 'required') && !_.has(constraints, 'func')) return updateEvent();
-		if(data.preRequirement && !data.preRequirement()) return updateEvent();
+		if(data.preRequirement && !data.preRequirement(this, id)) return updateEvent();
 
 		if(_.has(constraints, 'required')) {
 			let rule = get(constraints.required);
