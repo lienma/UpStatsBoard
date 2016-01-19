@@ -21,8 +21,6 @@ var log 			= require(paths.logger)('MIDDLEWARE')
   , config 			= require(paths.core + '/config')
   , database 		= require(paths.core + '/database');
 
-var partials 		= require('./partials');
-
 function setupMiddleware(upsboardApp) {
 	var logging = config.misc.logHttpRequests;
 
@@ -37,7 +35,7 @@ function setupMiddleware(upsboardApp) {
 	//app.use(app.sessions.create());
 	//app.use(csrf());
 	
-	upsboardApp.use(stylus.middleware({src: paths.public, compile: function(str, path) { return stylus(str).set('filename', path).use(nib()); }}));
+	upsboardApp.use(stylus.middleware({src: paths.public, compile: function (str, path) { return stylus(str).set('filename', path).use(nib()); }}));
 
 	if (logging !== false) {
 		if(upsboardApp.get('env') !== 'development') {
@@ -63,8 +61,6 @@ function setupMiddleware(upsboardApp) {
 		upsboardApp.use(serveStatic(paths.build));
 		upsboardApp.use(errorHandler({ dumpExceptions: true, showStack: true }));
 	}
-
-	upsboardApp.use('/partials', partials);
 }
 
 module.exports = setupMiddleware

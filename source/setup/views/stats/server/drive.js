@@ -1,4 +1,5 @@
 import Backbone      from 'backbone';
+import NotifyBar     from 'jqnotifybar';
 import numeral       from 'numeral';
 import TmplDriveView from '../../../templates/row-drive-item.jade';
 import DropdownView  from '../../dropdown';
