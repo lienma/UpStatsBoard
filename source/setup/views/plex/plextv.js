@@ -1,5 +1,6 @@
 import ViewSubTab from '../base-sub-tab';
 import Template   from '../../templates/view-plex-plextv.jade';
+import Notify     from '../../utils/notify';
 
 const DataSchema = {
 	'plexTvUsername': {
@@ -52,9 +53,11 @@ class PlexPyView extends ViewSubTab {
 				if(data.error) {
 					btn.addClass('btn-danger').removeClass('btn-default');
 					msg.text(data.error).addClass('text-danger');
+					Notify.failed('Failed: ' + data.error);
 				} else if(data.token) {
 					btn.addClass('btn-success').removeClass('btn-default');
 					msg.text('Successfully authenicated!').addClass('text-success');
+					Notify.success('Successfully authenicated with Plex.tv!');
 
 					this.set('plexToken', data.token);
 				}

@@ -13,25 +13,54 @@ class Validator {
 		this.setDataSchema($.extend(true, {}, options.dataSchema));
 
 		if(options.displayFormValidation) {
-			this.on('error', (id, hasError, el, value, msg) => {
-				let formGroup = el.parents('.form-group');
-				if(hasError) {
-					if(formGroup.find('.form-control-feedback').length === 0) {
-						let icon = $('<span />').addClass('glyphicon glyphicon-remove form-control-feedback');
-						el.after(icon);
-						el.tooltip({ container: 'body', title: msg });
-
-						if(el.is(':hover')) {
-							el.tooltip('show');
-						}
-					}
-				} else {
-					el.tooltip('destroy');
-					formGroup.find('.form-control-feedback').remove();
-				}
-				formGroup.toggleClass('has-error has-feedback', hasError);
-			});
+			let onErrorDisplay = this.onDisplayUpdate('error', 'glyphicon glyphicon glyphicon-remove');
+			let onWarningDisplay = this.onDisplayUpdate('warning', 'glyphicon glyphicon-exclamation-sign');
+			this.on('error', onErrorDisplay);
+			this.on('warning', onWarningDisplay);
 		}
+	}
+
+	onDisplayUpdate(key, iconClass) {
+		let isWarning = (key === 'warning');
+		let Key       = isWarning ? 'Warning' : 'Error';
+		let otherkey  = isWarning ? 'error' : 'warning';
+		let otherKey  = isWarning ? 'Error' : 'Warning';
+
+		return (id, has, el, value, msg) => {
+			el.data('has' + Key, has);
+			let formGroup = el.parents('.form-group');
+
+			if(has) {
+				let icon = $(formGroup.find('.form-control-feedback'));
+				if(!formGroup.hasClass(iconClass)) {
+					if(formGroup.find('.form-control-feedback').length === 0) {
+						icon = $('<span />');
+						el.after(icon);
+					} else {
+						icon.removeClass();
+					}
+					icon.addClass(iconClass + ' form-control-feedback');
+				}
+
+				el.data('has' + Key + 'Tooltip', true);
+
+				el.attr('title', msg).tooltip({ container: 'body' }).tooltip('fixTitle');
+
+				if(el.is(':hover')) {
+					el.tooltip('show');
+				}
+			} else {
+
+				if(el.data('has' + Key + 'Tooltip') && !el.data('has' + otherKey + 'Tooltip')) {
+					formGroup.find('.form-control-feedback').remove();
+					el.tooltip('destroy');
+				}
+				el.data('has' + Key + 'Tooltip', false);
+			}
+
+			formGroup.toggleClass('has-' + key, has);
+			formGroup.toggleClass('has-feedback', has || el.data('has' + otherKey));
+		};
 	}
 
 	bindToElement(data, id) {
@@ -105,17 +134,17 @@ class Validator {
 		}
 	}
 
-	validate(id) {
-		if(id !== undefined) {
+	validate(id, validateOnly=false) {
+		if(id !== undefined && !_.isBoolean(id)) {
 			if(_.isArray(id)) {
 				let errorCount = 0;
 				id.forEach((item) => {
-					errorCount += this.validateItem(item, this.dataSchema[item]) ? 0 : 1;
+					errorCount += this.validateItem(item, this.dataSchema[item], validateOnly) ? 0 : 1;
 				});
 				return (errorCount === 0);
 			} else {
 				if(this.dataSchema[id]) {
-					return this.validateItem(id, this.dataSchema[id]);
+					return this.validateItem(id, this.dataSchema[id], validateOnly);
 				} else {
 // throw an error
 throw new Error('ID not found')
@@ -123,31 +152,41 @@ throw new Error('ID not found')
 			}
 		} else {
 			let errorCount = 0;
+			validateOnly = (_.isBoolean(id)) ? id : false;
 			_.each(this.dataSchema, (data, id) => {
-				errorCount += this.validateItem(id, data) ? 0 : 1;
+				errorCount += this.validateItem(id, data, validateOnly) ? 0 : 1;
 			});
 			return (errorCount === 0);
 		}
 	}
 
-	validateItem(id, data) {
+	validateItem(id, data, validateOnly = false) {
+console.log('validate::' + id);
+
 		let hasError = false
-		let hasWarning = true;
+		let hasWarning = false;
+		let warningMessage = '';
 
 		let value = this.getValue(id);
 		let element = this.getElement(id);
 		let constraints = data.constraints;
 
-		let updateEvent = () => { this.trigger('update', id, value); this.trigger('update.' + id, value); errorEvent(); return true }
+		let self = this;
+		function trigger() {
+			if(validateOnly) return;
+			self.trigger.apply(self, arguments);
+		}
+
+		let updateEvent = () => { trigger('update', id, value); trigger('update:' + id, value); errorEvent(); return true; }
 		let msg = (rule) => { return (_.isArray(rule)) ? rule[1] : constraints.message; }
 		let get = (rule) => { return (_.isArray(rule)) ? rule[0] : rule; }
 		let errorEvent = () => {
 			let errorPresent = _.isString(hasError);
 			if(this._fieldIsvalid[id] !== errorPresent || hasError) {
 				this._fieldIsvalid[id] = errorPresent;
-				this.trigger('error', id, errorPresent, element, value, hasError);
+				trigger('error', id, errorPresent, element, value, hasError, validateOnly);
 			}
-		 };
+		};
 
 		if(!_.isObject(constraints)) return updateEvent();
 		if(value === '' && !_.has(constraints, 'required') && !_.has(constraints, 'func')) return updateEvent();
@@ -158,9 +197,9 @@ throw new Error('ID not found')
 
 			if(!ValidatorMethods.required.call(null, value, rule)) {
 				hasError = msg(constraints.required);
-				this.trigger(id + '.error', true, 'required', rule);
+				trigger('error:' + id, true, 'required', rule);
 			} else {
-				this.trigger(id + '.error', false, 'required', rule);
+				trigger('error:' + id, false, 'required', rule);
 			}
 		}
 
@@ -170,29 +209,39 @@ throw new Error('ID not found')
 			let rule = get(constraint);
 			if(!ValidatorMethods[key].call(null, value, rule)) {
 				hasError = msg(constraint);
-				this.trigger(id + '.error', true, key, rule);
+				trigger('error:' + id, true, key, rule);
 			} else {
-				this.trigger(id + '.error', false, key, rule);
+				trigger('error:' + id, false, key, rule);
 			}
 		});
 
 		if(_.isObject(constraints.warning)) {
 			if(!hasError) {
-				_.each(constraints.warning, (rule, key) => {
-					hasWarning =  hasWarning && ValidatorMethods[key].call(null, value, rule);
+				_.each(constraints.warning, (constraint, key) => {
+					if(hasWarning) return;
+
+					let results =  ValidatorMethods[key].call(null, value, get(constraint));
+					hasWarning = _.isString(results) ? true : results;
+					warningMessage = msg(constraint);
 				});
-				this.trigger(id + '.warning', hasWarning);
+				trigger('warning:' + id, hasWarning);
 			} else {
-				this.trigger(id + '.warning', false);
+				trigger('warning:' + id, false);
 			}
 		}
 
-		if(!hasError) {
-			return updateEvent();
-		} else {
+		if(hasError) {
 			errorEvent();
-			return false;
+		} else {
+			updateEvent();
 		}
+
+		if(_.isObject(constraints.warning)) {
+			trigger('warning', id, hasWarning, element, value, warningMessage, validateOnly);
+		}
+
+console.log('isValid::' + !hasError)
+		return !hasError;
 	}
 }
 

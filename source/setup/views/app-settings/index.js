@@ -9,13 +9,13 @@ export default BaseTab({
 
 	initialize(options) {
 
-		this.validator.on('appPortNumber.warning', (hasWarning) => {
+		this.listenTo(this.validator, 'warning:appPortNumber', (hasWarning) => {
 			let field = this.$('#appPortNumber').parents('.form-group');
 			field.toggleClass('has-warning', hasWarning);
 			this.$('#appPortNumberHelpNote').toggleClass('bold', hasWarning);
 		});
 
-		this.validator.on('appAdminPasswordConfirm.error', (hasError) => {
+		this.listenTo(this.validator, 'error:appAdminPasswordConfirm', (hasError) => {
 			this.$('#appAdminPassword').parents('.form-group').toggleClass('has-error', hasError);
 		});
 	}

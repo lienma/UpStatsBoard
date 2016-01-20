@@ -20,8 +20,8 @@ class DriveModel extends Backbone.Model {
 		return this.View.validator.validate();
 	}
 
-	view() {
-		this.View = new DriveView({ model: this });
+	view(modalView) {
+		this.View = new DriveView({ modal: modalView, model: this });
 		this.View.render();
 		return this.View.$el;
 	}

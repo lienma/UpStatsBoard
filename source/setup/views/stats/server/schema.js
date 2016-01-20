@@ -22,7 +22,11 @@ export default (self) => {
 			el: '#addServerHost',
 			preRequirement: isRemote,
 			constraints: {
-				required: [true, 'A host address is required.']
+				required: [true, 'A host address is required.'],
+
+				warning: {
+					func: [self.hasWarning('host'), 'Host was not found. Please check the host address.']
+				}
 			}
 		},
 
@@ -31,7 +35,10 @@ export default (self) => {
 			preRequirement: isRemote,
 			constraints: {
 				required: [true, 'A port number is required.'],
-				portNumber: [true, 'The port number is invalid for the remote server.']
+				portNumber: [true, 'The port number is invalid for the remote server.'],
+				warning: {
+					func: [self.hasWarning('port'), 'Connection was refused. Possibly wrong port number?']
+				}
 			}
 		},
 

@@ -16,8 +16,8 @@
           .row
             .col-md-12
               .btn-group(role='group').col-md-10.col-md-push-1
-                button(type='button', aria-label='Local Server', data-remote='false').btn.btn-info.col-md-6.bold.btn-server-location.active Local Server
-                button(type='button', aria-label='Remote Server', data-remote='true').btn.btn-info.col-md-6.bold.btn-server-location Remove Server
+                button(type='button', aria-label='Local Server', data-remote='false').btn.btn-default.col-md-6.bold.btn-server-location.active Local Server
+                button(type='button', aria-label='Remote Server', data-remote='true').btn.btn-default.col-md-6.bold.btn-server-location Remove Server
           .remote-server-details(style='display:none')
             .row
               .col-md-12
@@ -73,22 +73,22 @@
                 .col-sm-7
                   .row
                     .btn-group(role='group').btn-group-sm.col-md-8
-                      button(type='button', aria-label='Enable', data-model='monitorCpu', data-value=1).btn.btn-default.col-md-6.btn-server-switch.active Enable
-                      button(type='button', aria-label='Disable', data-model='monitorCpu', data-value=0).btn.btn-default.col-md-6.btn-server-switch Disable
+                      button(type='button', aria-label='Enable', data-model='monitorCpu', data-value='true').btn.btn-default.col-md-6.btn-server-switch.active Enable
+                      button(type='button', aria-label='Disable', data-model='monitorCpu', data-value='false').btn.btn-default.col-md-6.btn-server-switch Disable
               .form-group
                 label.col-sm-3.control-label Memory
                 .col-sm-7
                   .row
                     .btn-group(role='group').btn-group-sm.col-md-8
-                      button(type='button', aria-label='Enable', data-model='monitorMemory', data-value=1).btn.btn-default.col-md-6.btn-server-switch.active Enable
-                      button(type='button', aria-label='Disable', data-model='monitorMemory', data-value=0).btn.btn-default.col-md-6.btn-server-switch Disable
+                      button(type='button', aria-label='Enable', data-model='monitorMemory', data-value='true').btn.btn-default.col-md-6.btn-server-switch.active Enable
+                      button(type='button', aria-label='Disable', data-model='monitorMemory', data-value='false').btn.btn-default.col-md-6.btn-server-switch Disable
               .form-group
                 label.col-sm-3.control-label Bandwidth
                 .col-sm-7
                   .row
                     .btn-group(role='group').btn-group-sm.col-md-8
-                      button(type='button', aria-label='Enable', data-model='monitorBandwidth', data-value=1).btn.btn-default.col-md-6.btn-server-switch.active Enable
-                      button(type='button', aria-label='Disable', data-model='monitorBandwidth', data-value=0).btn.btn-default.col-md-6.btn-server-switch Disable
+                      button(type='button', aria-label='Enable', data-model='monitorBandwidth', data-value='true').btn.btn-default.col-md-6.btn-server-switch.active Enable
+                      button(type='button', aria-label='Disable', data-model='monitorBandwidth', data-value='false').btn.btn-default.col-md-6.btn-server-switch Disable
           .server-bandwidth
             .row
               .col-md-12

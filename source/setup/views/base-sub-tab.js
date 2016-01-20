@@ -100,8 +100,8 @@ class ViewSubTab extends Backbone.View {
 
 	}
 
-	validate() {
-		return this.validator.validate();
+	validate(validateOnly = false) {
+		return this.validator.validate(validateOnly);
 	}
 }
 

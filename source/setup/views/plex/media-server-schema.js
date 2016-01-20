@@ -20,21 +20,21 @@ const schema = {
 
 	'plexDefaultMovie': {
 		constraints: {
-			required: [true, 'An library id is required for the default movie library.'],
-			integer: [true, 'Invalided library id for default movie library.']
+			required: [true, 'An id is required for the default movie library.'],
+			integer: [true, 'Invalid id for default movie library.']
 		}
 	},
 
 	'plexDefaultTVShow': {
 		constraints: {
-			required: [true, 'An library id is required for the default tv show library.'],
-			integer: [true, 'Invalided library id for default movie library.']
+			required: [true, 'An id is required for the default tv show library.'],
+			integer: [true, 'Invalid id for default movie library.']
 		}
 	},
 
 	'plexDefaultMusic': {
 		constraints: {
-			integer: [true, 'Invalided library id for default movie library.']
+			integer: [true, 'Invalid id for default movie library.']
 		}
 	},
 

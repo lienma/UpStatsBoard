@@ -1,4 +1,6 @@
+import _               from 'underscore';
 import Backbone        from 'backbone';
+import Notify          from '../../../utils/notify';
 import TmplServerModal from '../../../templates/modal-server.jade';
 import ServerModel     from '../../../models/server';
 import ServerSchema    from './schema';
@@ -67,6 +69,7 @@ class ServerModalView extends Backbone.View {
 	}
 
 	clearConnectionBtnAndMsg() {
+		this.$('.has-warning').removeClass('has-warning');
 		this.$('.test-connection-failed').text('').addClass('hide');
 		this.$('.test-connection-success').addClass('hide');
 		this.$('.btn-test-connection').removeClass('btn-danger btn-success').addClass('btn-info');
@@ -101,7 +104,7 @@ class ServerModalView extends Backbone.View {
 		let model = new DriveModel();
 		model.server = this.model;
 		this.model.drives.add(model);
-		this.$('#addServerDrivesTable tbody').append(model.view());
+		this.$('#addServerDrivesTable tbody').append(model.view(this));
 	}
 
 	clickServerRemote(e) {
@@ -141,6 +144,7 @@ class ServerModalView extends Backbone.View {
 			errMsgSpan.toggleClass('hide', !hasErrors).html(errMsg || '');
 
 			if(successful) {
+				Notify.success('Connection was successfaully made!');
 				successMsgSpan.removeClass('hide');
 				btn.addClass('btn-success').removeClass('btn-info');
 			} else {
@@ -162,6 +166,11 @@ class ServerModalView extends Backbone.View {
 				let message = (data.error) ? '<b>Connection Failed!</b> ' + data.message : '';
 				btnClass(data.error, message);
 
+				if(data.error) {
+					this.displayRemoteConnectionError(data);
+					Notify.failed(message);
+				}
+
 				if(data.passphraseRequired) {
 					this.passphraseRequired = true;
 					this.validator.validate('passphrase');
@@ -173,6 +182,26 @@ class ServerModalView extends Backbone.View {
 			});
 		} else {
 			btnClass(true, '<b>Validation Failed!</b> Please double check the fields and try again.');
+		}
+	}
+
+	hasWarning(id) {
+		return () => {
+			return this.model.get('warning-' + id) ? true : false;
+		}
+	}
+
+	displayRemoteConnectionError(error) {
+		let setupValidator = (field) => {
+			this.model.set('warning-' + field, error.message);
+			$(this.validator.getElement(field)).one('keyup', () => this.model.set('warning-' + field, false) );
+			this.validator.validate(field);
+		};
+
+		if(error.hostNotFound) {
+			setupValidator('host');
+		} else if(error.connectionRefused) {
+			setupValidator('port');
 		}
 	}
 
@@ -211,6 +240,7 @@ class ServerModalView extends Backbone.View {
 				this.$('.server-authentication-password').css('display', 'none');
 				this.updateModelAuthentication();
 			}
+
 			this.setSwitchBtn('monitorCpu', model.get('monitorCpu'));
 			this.setSwitchBtn('monitorMemory', model.get('monitorMemory'));
 			this.setSwitchBtn('monitorBandwidth', model.get('monitorBandwidth'));
@@ -226,7 +256,7 @@ class ServerModalView extends Backbone.View {
 				this.model.drives.add(model);
 
 				model.server = this.model;
-				this.$('#addServerDrivesTable tbody').append(model.view());
+				this.$('#addServerDrivesTable tbody').append(model.view(this));
 			});
 		} else {
 			if(this.view.servers.hasLocalhost) {
@@ -244,7 +274,7 @@ class ServerModalView extends Backbone.View {
 	}
 
 	setBtnRemote(remote) {
-		this.$('.btn-server-location').each(() => {
+		this.$('.btn-server-location').each(function () {
 			if($(this).data('remote') === remote) {
 				$(this).addClass('active');
 			} else {
@@ -263,7 +293,7 @@ class ServerModalView extends Backbone.View {
 	}
 
 	setSwitchBtn(model, value) {
-		this.$('button[data-model="' + model +'"].btn-server-switch').each(() => {
+		this.$('button[data-model="' + model +'"].btn-server-switch').each(function () {
 			if($(this).data('value') === value) {
 				$(this).addClass('active');
 			} else {
@@ -277,7 +307,7 @@ class ServerModalView extends Backbone.View {
 	}
 
 	updateErrorBtn() {
-		let hasErrors = this.model.hasErrors();
+		let hasErrors = this.model.hasErrors;
 		this.$('#addServerBtn')
 			.toggleClass('btn-primary', !hasErrors)
 			.toggleClass('btn-danger', hasErrors);

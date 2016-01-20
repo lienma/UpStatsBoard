@@ -62,7 +62,7 @@ class ServerView extends SubTabView {
 		this.setUpData = data;
 	}
 
-	validate() {
+	validate(validateOnly = false) {
 		let hasCpu = false, hasMemory = false, hasDrives = false;
 
 		this.servers.each((server) => {
@@ -71,14 +71,16 @@ class ServerView extends SubTabView {
 			if(server.hasDrives) hasDrives = true;
 		});
 
-		this.$('.servers-drives').toggleClass('has-no-cpu', !hasCpu);
-		this.toggleError('cpu', 'Require at least one server to be monitoring CPU.', !hasCpu);
+		if(!validateOnly) {
+			this.$('.servers-drives').toggleClass('has-no-cpu', !hasCpu);
+			this.toggleError('cpu', 'Require at least one server to be monitoring CPU.', !hasCpu);
 
-		this.$('.servers-drives').toggleClass('has-no-memory', !hasMemory);
-		this.toggleError('memory', 'Require at least one server to be monitoring Memory.', !hasMemory);
+			this.$('.servers-drives').toggleClass('has-no-memory', !hasMemory);
+			this.toggleError('memory', 'Require at least one server to be monitoring Memory.', !hasMemory);
 
-		this.$('.servers-drives').toggleClass('has-no-drives', !hasDrives);
-		this.toggleError('drives', 'Require at least one drive to be monitoring.', !hasDrives);
+			this.$('.servers-drives').toggleClass('has-no-drives', !hasDrives);
+			this.toggleError('drives', 'Require at least one drive to be monitoring.', !hasDrives);
+		}
 
 		return hasDrives && hasMemory && hasCpu;
 	}

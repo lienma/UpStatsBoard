@@ -107,7 +107,9 @@ class SubTabBtn extends Backbone.View {
 	}
 
 	updateTabForErrors() {
-		let hasErrors = this.hasErrors;
+		let isValidate = this.parentPane.currentTab().validate(true);
+		let hasErrors = !isValidate && this.hasErrors;
+
 		let link = this.$('a');
 		let icon = this.$('.tab-status');
 
@@ -118,8 +120,10 @@ class SubTabBtn extends Backbone.View {
 			hasErrors = !this.parentPane.currentTab().isEnabled;
 		}
 
-		link.toggleClass('wizard-sub-tabs-success', !hasErrors);
-		icon.toggleClass('glyphicon-ok', !hasErrors);
+		if(isValidate) {
+			link.toggleClass('wizard-sub-tabs-success', !hasErrors);
+			icon.toggleClass('glyphicon-ok', !hasErrors);
+		}
 
 		this.updateErrorsTooltip();
 	}

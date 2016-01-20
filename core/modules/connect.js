@@ -15,7 +15,7 @@ var log				= require(paths.logger)('CONNECT');
 
 function Connection (options) {
 	var self = this;
-	this.remote = (options.remote == 'true') ? true : false;
+	this.remote = (options.remote === true) ? true : false;
 	this.events = new EventEmitter();
 
 	if(this.remote) {
@@ -63,7 +63,7 @@ Connection.prototype.command = function (cmd) {
 					});
 				}
 			});
-		});
+		}).catch(reject);
 	});
 };
 
@@ -178,12 +178,14 @@ console.log('driveData', driveData);
 				return resolve(driveData);
 			}
 		}).catch(function (err) {
-			console.log(chalk.red(err), err);
+console.log(chalk.red(err), err);
 			if(err.message.indexOf('No such file or directory') > -1) {
 				log.debug(chalk.red('Failed to retrieve drive information.'), chalk.red('Location'), chalk.cyan(location), chalk.red('was not found.'));
 				var errReject = new Error('DRIVE_NOT_FOUND');
 				errReject.msg = 'Drive (' + location + ') was not found.';
 				reject(errReject);
+			} else {
+				reject(err);
 			}
 		});
 	});

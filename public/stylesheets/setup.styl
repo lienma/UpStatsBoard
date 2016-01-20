@@ -1,6 +1,9 @@
 .ui-effects-wrapper
 	display inline
 
+.padding-10
+	padding 10px
+
 .normal
 	font-weight normal
 
@@ -19,6 +22,32 @@
 
 	.form-control-feedback
 		right 0 !important
+
+.jquery-notify-bar.notify-error
+	color #fff
+	background-color #c12e2a
+	background-image linear-gradient(to bottom, #d9534f 0%, #c12e2a 100%)
+	background-repeat repeat-x
+
+.jquery-notify-bar.notify-info
+	color #fff
+	background-color #2aabd2
+	background-image linear-gradient(to bottom, #5bc0de 0%, #2aabd2 100%)
+	background-repeat repeat-x
+	cursor default
+
+.jquery-notify-bar.notify-success
+	color #fff
+	background-color #419641
+	background-image: linear-gradient(to bottom, #5cb85c 0%, #419641 100%)
+	background-repeat repeat-x
+
+.jquery-notify-bar
+	a.notify-bar-close
+		color #fff
+	a.notify-bar-close:hover
+		text-decoration none
+		color #fff
 
 .servers-drives.has-no-cpu
 	th:nth-child(3), td:nth-child(3)

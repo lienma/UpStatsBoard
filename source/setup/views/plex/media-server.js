@@ -2,6 +2,7 @@ import ViewSubTab        from '../base-sub-tab';
 import Template          from '../../templates/view-plex-media-server.jade';
 import DataSchema        from './media-server-schema';
 import SelectLibraryView from './select-library';
+import Notify            from '../../utils/notify';
 
 class MediaServerView extends ViewSubTab {
 	get template() { return Template; }
@@ -53,22 +54,28 @@ class MediaServerView extends ViewSubTab {
 				if(data.connection) {
 					btn.addClass('btn-success').removeClass('btn-default');
 					msg.text('Connection was successful!').addClass('text-success');
+					Notify.successConnection();
 				} else {
 					btn.addClass('btn-danger').removeClass('btn-default');
 					msg.addClass('text-danger');
+
+					let message = '';
 					if(data.hostNotFound) {
-						msg.html('<b>Failed:</b> IP/Host Address not found.');
+						message = '<b>Failed:</b> IP/Host Address not found.';
 						this.$('#plexMediaServerHost').parents('.form-group').addClass('has-warning');
 					} else if(data.connectionRefused) {
-						msg.html('<b>Failed:</b> Connection was refused. Check ip address and port.');
+						message = '<b>Failed:</b> Connection was refused. Check ip address and port.';
 						this.$('#plexMediaServerHost, #plexMediaServerPortNumber').parents('.form-group').addClass('has-warning');
 					} else if(data.unauthorized) {
-						msg.html('<b>Failed:</b> Unauthorized access. Check username and password for Plex.tv account.');
+						message = '<b>Failed:</b> Unauthorized access. Check username and password for Plex.tv account.';
 						this.$('#plexTvUsername, #plexTvPassword').parents('.form-group').addClass('has-warning');
 					} else if(data.wrongCredentials) {
-						msg.html('<b>Failed:</b> Unabled to retrieve plex token. Check username and password for Plex.tv account.');
+						message = '<b>Failed:</b> Unabled to retrieve plex token. Check username and password for Plex.tv account.';
 						this.$('#plexTvUsername, #plexTvPassword').parents('.form-group').addClass('has-warning');
 					}
+
+					msg.html(message);
+					Notify.failed(message);
 				}
 			});
 		}

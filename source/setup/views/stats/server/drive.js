@@ -1,5 +1,6 @@
+import _             from 'underscore';
 import Backbone      from 'backbone';
-import NotifyBar     from 'jqnotifybar';
+import Notify        from '../../../utils/notify';
 import numeral       from 'numeral';
 import TmplDriveView from '../../../templates/row-drive-item.jade';
 import DropdownView  from '../../dropdown';
@@ -15,8 +16,9 @@ class DriveView extends Backbone.View {
 		};
 	}
 
-	initialize() {
+	initialize(options) {
 		this.driveLocationValid = true;
+		this.modal = options.modal;
 
 		this.totalSpace = new DropdownView([['KB', 'KiloBytes'], ['MB', 'MegaBytes'], ['GB', 'GigaBytes'], ['TB', 'TeraBytes'], ['PB', 'PetaBytes']], { size: 'sm' });
 
@@ -60,27 +62,39 @@ class DriveView extends Backbone.View {
 	clickTest(e) {
 		e.preventDefault();
 
-		this.$('.btn-drive-test').tooltip('hide');
+		if(this.validator.validate('location')) {
 
-		let postData = this.model.server.serverLogin;
-		postData.location = this.model.get('location');
+			this.$('.btn-drive-test').tooltip('hide');
 
-		$.ajax({
-			url: Config.WebRoot + '/setup/server/drive',
-			method: 'POST',
-			data: postData
-		}).done((data) => {
-			if(data.error) {
-				alert(data.msg); //eslint-disable-line no-alert
-			} else {
-				let msg = [
-					'Used: ' + numeral(data.drive.used).format('0.0 b'),
-					'Total: ' + numeral(data.drive.total).format('0.0 b'),
-					'Precentage Used: ' + numeral(data.drive.used / data.drive.total).format('0%')
-				];
-				alert(msg.join('\n')); //eslint-disable-line no-alert
-			}
-		});
+			let postData = this.model.server.serverLogin;
+			postData.location = this.model.get('location');
+
+			$.ajax({
+				url: Config.WebRoot + '/setup/server/drive',
+				method: 'POST',
+				data: postData
+			}).done((data) => {
+				if(data.error) {
+					let message = '<b>Error!</b> ';
+					if(!data.driveNotFound) {
+						message = '<b>Connection Failed!</b> ';
+					}
+					message += data.message;
+
+					Notify.failed(message);
+
+					this.modal.displayRemoteConnectionError(data);
+				} else {
+					let msgs = [
+						'<b>Space used:</b> ' + numeral(data.drive.used).format('0.0 b'),
+						'<b>Total space:</b> ' + numeral(data.drive.total).format('0.0 b'),
+						'<b>Precentage Used:</b> ' + numeral(data.drive.used / data.drive.total).format('0%')
+					];
+
+					Notify.info(_.map(msgs, (msg) => { return '<span class="padding-10">' + msg + '</span>'; }))
+				}
+			});
+		}
 	}
 
 	deleteView() {

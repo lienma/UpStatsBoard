@@ -21,7 +21,11 @@ const DefaultData = {
   'stats': {
       'server': [{
           'label': 'GrizzlyBear',
-          'remote': false,
+          'remote': true,
+          'host': 'grizzlybear',
+          'port': 2312,
+          'username': 'asdfsdf',
+          'password': 'asdfasdf',
           'drives': [{
             'label': 'Root',
             'location': '/'

@@ -1,6 +1,7 @@
 import ViewSubTab from '../base-sub-tab';
 import Template   from '../../templates/view-plex-plexpy.jade';
 import DataSchema from './plexpy-schema';
+import Notify     from '../../utils/notify';
 
 class PlexPyView extends ViewSubTab {
 	get enabledRequired() { return true; }
@@ -52,22 +53,27 @@ class PlexPyView extends ViewSubTab {
 				if(data.connection) {
 					btn.addClass('btn-success').removeClass('btn-info');
 					msg.text('Connection was successful!').addClass('text-success').removeClass('text-info');
+					Notify.successConnection();
 				} else {
 					btn.addClass('btn-danger').removeClass('btn-info');
 					msg.addClass('text-danger').removeClass('text-info');
+					let message = '';
 					if(data.hostNotFound) {
-						msg.html('<b>Failed:</b> IP/Host Address not found.');
+						message = '<b>Failed:</b> IP/Host Address not found.';
 						this.$('.app-host').parents('.form-group').addClass('has-warning');
 					} else if(data.connectionRefused) {
-						msg.html('<b>Failed:</b> Connection was refused. Check ip address and port.');
+						message = '<b>Failed:</b> Connection was refused. Check ip address and port.';
 						this.$('.app-host, .app-port').parents('.form-group').addClass('has-warning');
 					} else if(data.pathNotFound) {
-						msg.html('<b>Failed:</b> Service not found. Possibly wrong web root or ssl?');
+						message = '<b>Failed:</b> Service not found. Possibly wrong web root or ssl?';
 						this.$('.app-web-root, .app-use-ssl').parents('.form-group').addClass('has-warning');
 					} else if(data.wrongApiKey) {
-						msg.html('<b>Failed:</b> Invalid API Key.');
+						message = '<b>Failed:</b> Invalid API Key.';
 						this.$('.app-api-key').parents('.form-group').addClass('has-warning');
 					}
+
+					msg.html(message);
+					Notify.failed(message);
 				}
 			});
 		}
