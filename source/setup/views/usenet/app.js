@@ -190,10 +190,7 @@ class UsenetApp extends Backbone.View {
 	}
 
 	validate() {
-console.log('validate');
-
 		if(this.isEnabled && this.hasRender) {
-console.log('validate - isEnabled')
 			return this.validator.validate();
 		}
 		return true;

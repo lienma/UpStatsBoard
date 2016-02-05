@@ -147,9 +147,9 @@ class SubTabBtn extends Backbone.View {
 
 	updateTabAppIcon(model) {
 		this.apps.forEach((app) => {
-			this.$('.tab-app').toggleClass('icos-' + app.id, model.get('enabled'));
+			this.$('.tab-app').toggleClass('icos-' + app.id, app.model.get('enabled'));
 
-			if(model.get('enabled')) {
+			if(app.model.get('enabled')) {
 				this._tabIcon = app.id;
 			}
 		});
