@@ -17,12 +17,42 @@ class ViewSubTab extends Backbone.View {
 
 		this.listenTo(this.validator, 'update', (id, value) => this.set(id, value) );
 		this.listenTo(this.validator, 'error', this.updateOnValidatorError);
+		this.listenTo(this.validator, 'validate', this.updateOnValidate);
 		this.listenTo(this.model.errors, 'update', this.updateOnModelError);
 
 		this.$el.addClass('tab-pane fade');
 		this.$el.prop('role', 'tabpanel');
 		this.$el.attr('id', options.basePane.id + '-' + this.model.id);
 
+
+		let events = {};
+		_.extend(events, this.events, {
+			'click .btn-switch': '_clickSwitchBtn'
+		});
+		this.delegateEvents(events);
+	}
+
+	_clickSwitchBtn(e) {
+		e.preventDefault();
+
+		let target = $(e.target)
+		  , model = target.data('model')
+		  , value = target.data('value');
+
+		target.blur();
+
+		this._setSwitchBtn(model, value);
+		this.set(model, value);
+	}
+
+	_setSwitchBtn(model, value) {
+		this.$('button[data-model="' + model +'"].btn-switch').each(function () {
+			if($(this).data('value') === value) {
+				$(this).addClass('active');
+			} else {
+				$(this).removeClass('active');
+			}
+		});
 	}
 
 	updateOnModelError() {
@@ -36,6 +66,10 @@ class ViewSubTab extends Backbone.View {
 		} else {
 			this.removeError(id, el);
 		}
+	}
+
+	updateOnValidate(valid) {
+		this.model.tab.updateTabClass(valid);
 	}
 
 	listenToData(eventName, callback) {
@@ -101,7 +135,8 @@ class ViewSubTab extends Backbone.View {
 	}
 
 	validate(validateOnly = false) {
-		return this.validator.validate(validateOnly);
+		let results = this.validator.validate(validateOnly);
+		return results;
 	}
 }
 

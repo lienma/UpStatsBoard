@@ -6,33 +6,17 @@ import AppSettingsView  from './app-settings';
 import UsenetView       from './usenet';
 import PlexView         from './plex';
 import StatsView        from './stats';
+import OverviewView     from './overview';
 
 const Router = Backbone.Router.extend({});
-
-const DefaultData = {
-  'plex': {
-    plexpy: {
-      'plexPyHost': 'plex',
-      'plexPyPort': 8181,
-      'plexPyWebRoot': '/watch',
-      'plexPyApiKey': 'aa'
-    }
-  },
-  'stats': {
-      'server': [{
-          'label': 'GrizzlyBear',
-          'remote': true,
-          'host': 'grizzlybear',
-          'port': 2312,
-          'username': 'asdfsdf',
-          'password': 'asdfasdf',
-          'drives': [{
-            'label': 'Root',
-            'location': '/'
-          }]
-      }]
-    }
-};
+const Steps = [
+  ['welcome',  'Welcome',        WelcomeStepView],
+  ['settings', 'App Settings',   AppSettingsView],
+  ['usenet',   'Usenet Apps',    UsenetView],
+  ['plex',     'Plex Settings',  PlexView],
+  ['stats',    'Stats Settings', StatsView],
+  ['overview', 'Overview',       OverviewView]
+];
 
 class AppView extends Backbone.View {
   get el() { return '#SetupWizard'; }
@@ -40,27 +24,24 @@ class AppView extends Backbone.View {
   initialize() {
     this.Router = new Router();
 
+    this.AppData = new Backbone.Model();
+
     this.Wizard = new WizardCollection();
     this.Wizard.Router = this.Router;
+    this.Wizard.AppData = this.AppData;
 
-    this.listenTo(this.Wizard, 'add', (model) => model.pane = new PaneBase({ model: model, wizard: this }) );
+    this.listenTo(this.Wizard, 'add', (model) => model.pane = new PaneBase({ model: model, wizard: this, AppData: this.AppData }) );
+
+    //this.listenTo(this.AppData, 'change', () => console.log('change', this.AppData.attributes));
 
     this.generateSteps();
-    this.Wizard.setDefaults(DefaultData);
-
-    this.renderAll();
-    this.Wizard.openAt('stats/server');
   }
 
   generateSteps() {
-    this.Wizard.add([
-      { id: 'welcome', title: 'Welcome', body: WelcomeStepView },
-      { id: 'app-settings', title: 'App Settings', body: AppSettingsView },
-      { id: 'usenet', title: 'Usenet Apps', body: UsenetView },
-      { id: 'plex', title: 'Plex Settings', body: PlexView },
-      { id: 'stats', title: 'Stats Settings', body: StatsView }
-
-    ]);
+    let steps = Steps.map((Step) => {
+      return { id: Step[0], title: Step[1], body: Step[2] };
+    });
+    this.Wizard.add(steps);
   }
 
   nextStep() {
@@ -73,6 +54,18 @@ class AppView extends Backbone.View {
 
   setCurrentTab(id) {
     this.Wizard.setCurrent(id);
+  }
+
+  setData(defaultData) {
+    this.Wizard.setDefaults(defaultData);
+  }
+
+  open(url) {
+    this.Wizard.openAt(url);
+  }
+
+  render() {
+    this.renderAll();
   }
 
   renderAll() {

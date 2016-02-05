@@ -2,7 +2,8 @@
 export default (self) => {
 	return {
 		'plexPyEnabled': {
-			el: '.app-enable'
+			el: '.app-enable',
+			default: false
 		},
 
 		'plexPyHost': {
@@ -37,7 +38,8 @@ export default (self) => {
 		},
 
 		'plexPyUseSSL': {
-			el: '.app-use-ssl'
+			el: '.app-use-ssl',
+			default: false
 		}
 	}
 };

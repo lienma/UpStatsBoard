@@ -29,18 +29,6 @@ const dataSchema = {
 		default: '/'
 	},
 
-	'appLogHttpRequests': {
-		default: true
-	},
-
-	'appCheckForUpdates': {
-		default: true
-	},
-
-	'appAutoUpdate': {
-		default: true
-	},
-
 	'appAdminEmail': {
 		constraints: {
 			message: 'You have entered an invalid email address.',

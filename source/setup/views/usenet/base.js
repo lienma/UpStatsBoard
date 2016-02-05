@@ -1,7 +1,8 @@
 import _               from 'underscore';
-import ViewSubTab     from '../base-sub-tab';
+import ViewSubTab      from '../base-sub-tab';
 import AppView         from './app';
-import ViewAppSelector from './app-selector';
+import AppSelectorView from './app-selector';
+import DataSchema      from './schema';
 
 export default (apps, title = '') => {
 	let Apps = [];
@@ -25,10 +26,17 @@ export default (apps, title = '') => {
 				app.parentPane = this;
 				this.listenTo(app.model.errors, 'update', this.updateErrorsModel);
 				this.listenTo(app.model, 'change:selected', this.updateCurrent);
+
+				_.each(DataSchema, (data, id) => {
+					let key = 'usenet.' + app.id + '.' + id;
+					let def = data.default;
+					def = (def === undefined) ? '' : def;
+					this.set(key, def);
+				});
 			});
 
 			if(this.hasMultipleApps) {
-				this.appSelector = new ViewAppSelector({ apps: Apps, parentPane: this, title: title });
+				this.appSelector = new AppSelectorView({ apps: Apps, parentPane: this, title: title });
 			}
 		}
 
@@ -106,6 +114,10 @@ export default (apps, title = '') => {
 				}
 
 				this.$el.append(app.$el);
+
+				if(this.hasMultipleApps && app.isEnabled) {
+					this.appSelector.selectApp(app.id);
+				}
 			});
 
 			return this;

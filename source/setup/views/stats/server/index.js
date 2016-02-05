@@ -21,6 +21,8 @@ class ServerView extends SubTabView {
 		this.viewServers = new ServerListView({ servers: this.servers, view: this });
 
 		this.listenTo(this.servers, 'update', this.updateServersSuccess);
+
+		this.listenTo(this.servers, 'update', () => this.set('servers', JSON.stringify(this.servers)) );
 	}
 
 	clickAddServer(e) {

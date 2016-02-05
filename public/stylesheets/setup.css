@@ -1,6 +1,15 @@
 .ui-effects-wrapper {
   display: inline;
 }
+.padding-5 {
+  padding: 5px;
+}
+.padding-left-5 {
+  padding-left: 5px;
+}
+.padding-right-5 {
+  padding-right: 5px;
+}
 .padding-10 {
   padding: 10px;
 }
@@ -307,6 +316,7 @@ ul.tooltip-errors-list > li {
 .wizard .wizard-sub-tabs .wizard-sub-tabs-title {
   margin-left: 5px;
   margin-right: 5px;
+  text-shadow: 0 1px 0px #999;
 }
 .wizard .wizard-sub-content {
   padding-left: 10px;

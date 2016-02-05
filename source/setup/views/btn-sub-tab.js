@@ -107,23 +107,24 @@ class SubTabBtn extends Backbone.View {
 	}
 
 	updateTabForErrors() {
-		let isValidate = this.parentPane.currentTab().validate(true);
-		let hasErrors = !isValidate && this.hasErrors;
+		let isValidate = this.model.body.validate(true);
+		this.updateTabClass(isValidate);
+	}
 
+	updateTabClass(isValid) {
+		let hasErrors = this.hasErrors;
 		let link = this.$('a');
 		let icon = this.$('.tab-status');
 
 		link.toggleClass('wizard-sub-tabs-error', hasErrors);
 		icon.toggleClass('glyphicon-remove', hasErrors);
 
-		if(this.parentPane.currentTab().enabledRequired && !hasErrors) {
-			hasErrors = !this.parentPane.currentTab().isEnabled;
+		if(this.model.body.enabledRequired) {
+			isValid = this.model.body.isEnabled;
 		}
 
-		if(isValidate) {
-			link.toggleClass('wizard-sub-tabs-success', !hasErrors);
-			icon.toggleClass('glyphicon-ok', !hasErrors);
-		}
+		link.toggleClass('wizard-sub-tabs-success', isValid);
+		icon.toggleClass('glyphicon-ok', isValid);
 
 		this.updateErrorsTooltip();
 	}
@@ -161,6 +162,10 @@ class SubTabBtn extends Backbone.View {
 		this.$('a').on('show.bs.tab', (e) => {
 			this.basePane._currentSubTab = this.model.id;
 			this.basePane.wizard.Router.navigate(this.basePane.id + '/' + this.model.id);
+		});
+
+		this.$('a').on('hide.bs.tab', (e) => {
+			this.parentPane.currentTab().validate();
 		});
 
 		if(this._tabIcon !== '') {

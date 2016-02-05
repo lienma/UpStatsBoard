@@ -11,9 +11,16 @@ html(lang='en')
 
     block stylesheet
 
-    script(src='http://167.114.44.110:35729/livereload.js?snipver=1')
     script(src=locals.webRoot + '/javascript/vendor.bundle.js')
     script(type='text/javascript').
+      (function(a, b, c, d, e) {
+        var script = a.createElement(b);
+        var scripts = a.getElementsByTagName(b)[0];
+        script.async = true;
+        script.src = c.protocol + '//' + c.hostname + ':' + d + '/' + e;
+        scripts.parentNode.insertBefore(script, scripts);
+      })(document, 'script', location, 35729, 'livereload.js?snipver=1');
+
       var Config = {
         Seed: #{locals.seed},
         WebRoot: '#{locals.webRoot}',

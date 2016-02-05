@@ -8,7 +8,8 @@ class PlexPyView extends ViewSubTab {
 	get template() { return Template; }
 	get events() {
 		return {
-			'click .btn-app-test': 'clickTestConnection'
+			'click .btn-app-test': 'clickTestConnection',
+			'click .btn-switch-usenet': '_clickSwitchBtn'
 		}
 	}
 
@@ -22,6 +23,37 @@ class PlexPyView extends ViewSubTab {
 		this.setDataSchema(DataSchema(this));
 
 		this.listenToData('change:plexPyEnabled', this.updateEnabledField);
+	}
+
+	_clickSwitchBtn(e) {
+		e.preventDefault();
+
+		let target = $(e.target)
+		  , model = target.data('model')
+		  , value = target.data('value');
+
+		if(value === 'false') {
+			value = false;
+		}
+
+		if(value === 'true') {
+			value = true;
+		}
+
+		target.blur();
+
+		this._setSwitchBtn(model, value);
+		this.set(model, value);
+	}
+
+	_setSwitchBtn(model, value) {
+		this.$('button[data-model="' + model +'"].btn-switch-usenet').each(function () {
+			if($(this).data('value') === value) {
+				$(this).addClass('active');
+			} else {
+				$(this).removeClass('active');
+			}
+		});
 	}
 
 	clickTestConnection(e) {
@@ -46,7 +78,7 @@ class PlexPyView extends ViewSubTab {
 					port    : this.get('plexPyPort'),
 					webRoot : this.get('plexPyWebRoot'),
 					apiKey  : this.get('plexPyApiKey'),
-					useSSL  : this.get('plexPyUseSSL')
+					useSSL  : this.get('plexPySSLEnable')
 				}
 			}).done((data) => {
 				btn.removeClass('active');
@@ -90,11 +122,9 @@ class PlexPyView extends ViewSubTab {
 	}
 
 	updateEnabledField() {
-		this.$('.app-enable').prop('checked', this.isEnabled);
+		this._setSwitchBtn('plexPyEnabled', this.isEnabled);
 		this.$('.btn-app-test').prop('disabled', !this.isEnabled);
 		this.fields.forEach((field) => this.$('.app-' + field).prop('disabled', !this.isEnabled) );
-
-		this.validator.validate();
 	}
 
 	render() {
@@ -104,6 +134,8 @@ class PlexPyView extends ViewSubTab {
 			apiUiLocation: 'Settings > Access Control > API',
 			default_port: 8181
 		}));
+
+		this.updateEnabledField()
 	}
 }
 

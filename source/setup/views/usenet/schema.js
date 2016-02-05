@@ -1,6 +1,7 @@
 export default {
 	'enabled': {
-		el: '.app-enable'
+		el: '.app-enable',
+		default: false
 	},
 
 	'host': {
@@ -32,6 +33,7 @@ export default {
 	},
 
 	'useSSL': {
-		el: '.app-use-ssl'
+		el: '.app-use-ssl',
+		default: false
 	}
 };

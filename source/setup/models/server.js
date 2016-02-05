@@ -2,7 +2,7 @@ import _               from 'underscore';
 import Backbone        from 'backbone';
 import DriveCollection from '../collections/drive';
 
-let ErrorModel = Backbone.Model.extend({
+const ErrorModel = Backbone.Model.extend({
 	defaults: {
 		msg: ''
 	}

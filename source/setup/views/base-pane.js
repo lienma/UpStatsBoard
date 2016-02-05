@@ -16,7 +16,7 @@ class BasePane extends Backbone.View {
 		let body = this.model.get('body');
 
 		this._tab = new TabItemView({ model: this.model, pane: this });
-		this._body = new body({ model: this.model, pane: this });
+		this._body = new body({ model: this.model, pane: this, AppData: options.AppData });
 
 		this.get = this.model.get.bind(this.model);
 		this.set = this.model.set.bind(this.model);
@@ -77,9 +77,17 @@ class BasePane extends Backbone.View {
 		}
 	}
 
+	openLast() {
+		if(this._body.hasSubTabs()) {
+			let lastTab = this._body.subTabs.last();
+			this._currentSubTab = lastTab.id;
+			this.openAt(lastTab.id);
+		}
+	}
+
 	nextStep() {
 		if(this._body.hasSubTabs()) {
-			let index = this.getCurrentTab().index;
+			let index = this.getCurrentTab.index;
 
 			if(index + 1 >= this._body.subTabs.size()) {
 				this.wizard.nextStep();
@@ -94,8 +102,8 @@ class BasePane extends Backbone.View {
 
 	previousStep() {
 		if(this._body.hasSubTabs()) {
-			let index = this.getCurrentTab().index;
-
+			let index = this.getCurrentTab.index;
+console.log('index:', index)
 			if(index === 0) {
 				this.wizard.previousStep();
 			} else {

@@ -307,7 +307,7 @@ class ServerModalView extends Backbone.View {
 	}
 
 	updateErrorBtn() {
-		let hasErrors = this.model.hasErrors;
+		const hasErrors = this.model.hasErrors;
 		this.$('#addServerBtn')
 			.toggleClass('btn-primary', !hasErrors)
 			.toggleClass('btn-danger', hasErrors);

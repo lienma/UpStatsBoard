@@ -1,0 +1,18 @@
+.row(style='padding:10px')
+  .col-md-12
+    a(role='button', href='#').btn.btn-default.col-md-4.col-md-push-4.btn-add-service
+      i.glyphicon.glyphicon-plus-sign
+      span(style='padding-left:5px') Add Service
+.row
+  .col-md-12
+    table.table.table-striped.table-hover.services-table
+      thead
+        tr
+          th Label
+          th(style='width:20%') Address
+          th(style='width:35%') Url (Required Login)
+          th(style='width:150px').text-center Timeout
+          th(style='width:70px')
+      tbody
+        tr.no-services-monitoring
+          td(colspan=4).bold.text-center There are no services setup to monitor.

@@ -12,6 +12,8 @@ class Validator {
 
 		this.setDataSchema($.extend(true, {}, options.dataSchema));
 
+		this.displayFormValidation = options.displayFormValidation;
+
 		if(options.displayFormValidation) {
 			let onErrorDisplay = this.onDisplayUpdate('error', 'glyphicon glyphicon glyphicon-remove');
 			let onWarningDisplay = this.onDisplayUpdate('warning', 'glyphicon glyphicon-exclamation-sign');
@@ -81,17 +83,34 @@ class Validator {
 
 	getElement(id) {
 		let data = this.dataSchema[id];
-		return $(this.body.find((data.el) ? data.el : '#' + id));
+		let element = (data.el !== undefined) ? data.el : '#' + id;
+		return $(this.body.find(element));
 	}
 
 	getValue(id) {
+		let value = '';
 		let element = this.getElement(id);
 
-		if(element.attr('type') === 'checkbox') {
-			return element.prop('checked');
+		if(element.hasClass('btn')) {
+			element.each(function() {
+				if($(this).hasClass('active')) {
+					value = $(this).data('value');
+
+				}
+			});
 		} else {
-			return element.val();
+			if(element.attr('type') === 'checkbox') {
+				value = element.prop('checked');
+			} else {
+				value = element.val();
+			}
 		}
+
+		if(value !== '' && !_.isBoolean(value) && !isNaN(Number(value))) {
+			value = Number(value);
+		}
+
+		return value;
 	}
 
 	renderDefaults() {
@@ -127,10 +146,20 @@ class Validator {
 
 	setValue(id, value) {
 		var element = this.getElement(id);
-		if(element.attr('type') === 'checkbox') {
-			return element.prop('checked', value);
+		if(element.hasClass('btn')) {
+			element.each(function () {
+				if($(this).data('value') === value) {
+					$(this).addClass('active');
+				} else {
+					$(this).removeClass('active');
+				}
+			});
 		} else {
-			return element.val(value);
+			if(element.attr('type') === 'checkbox') {
+				element.prop('checked', value);
+			} else {
+				element.val(value);
+			}
 		}
 	}
 
@@ -141,10 +170,19 @@ class Validator {
 				id.forEach((item) => {
 					errorCount += this.validateItem(item, this.dataSchema[item], validateOnly) ? 0 : 1;
 				});
+
+				if(!validateOnly) {
+					this.trigger('validate', (errorCount === 0));
+				}
 				return (errorCount === 0);
 			} else {
 				if(this.dataSchema[id]) {
-					return this.validateItem(id, this.dataSchema[id], validateOnly);
+					let results = this.validateItem(id, this.dataSchema[id], validateOnly)
+
+					if(!validateOnly) {
+						this.trigger('validate', results);
+					}
+					return results;
 				} else {
 // throw an error
 throw new Error('ID not found')
@@ -154,17 +192,22 @@ throw new Error('ID not found')
 			let errorCount = 0;
 			validateOnly = (_.isBoolean(id)) ? id : false;
 			_.each(this.dataSchema, (data, id) => {
-				errorCount += this.validateItem(id, data, validateOnly) ? 0 : 1;
+				let valid = this.validateItem(id, data, validateOnly);
+				errorCount += valid ? 0 : 1;
 			});
-			return (errorCount === 0);
+
+			const isValid = (errorCount === 0);
+			if(!validateOnly) {
+				this.trigger('validate', isValid);
+			}
+
+			return isValid;
 		}
 	}
 
 	validateItem(id, data, validateOnly = false) {
-console.log('validate::' + id);
-
 		let hasError = false
-		let hasWarning = false;
+		let hasWarning = true;
 		let warningMessage = '';
 
 		let value = this.getValue(id);
@@ -218,11 +261,13 @@ console.log('validate::' + id);
 		if(_.isObject(constraints.warning)) {
 			if(!hasError) {
 				_.each(constraints.warning, (constraint, key) => {
-					if(hasWarning) return;
-
 					let results =  ValidatorMethods[key].call(null, value, get(constraint));
-					hasWarning = _.isString(results) ? true : results;
-					warningMessage = msg(constraint);
+					let boolResults = _.isString(results) ? true : results;
+					hasWarning = hasWarning && boolResults;
+
+					if(hasWarning) {
+						warningMessage = msg(constraint);
+					}
 				});
 				trigger('warning:' + id, hasWarning);
 			} else {
@@ -240,7 +285,6 @@ console.log('validate::' + id);
 			trigger('warning', id, hasWarning, element, value, warningMessage, validateOnly);
 		}
 
-console.log('isValid::' + !hasError)
 		return !hasError;
 	}
 }
@@ -310,6 +354,12 @@ const ValidatorMethods = {
 
 	maxSize: function (value, rule) {
 		return this.lessThan(value.length, rule);
+	},
+
+	minMax: function (value, rule) {
+		value = parseFloat(value);
+
+		return value >= parseFloat(rule[0]) && value <= parseFloat(rule[1]);
 	},
 
 	number: function (value, rule) {

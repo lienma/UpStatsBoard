@@ -3,11 +3,12 @@ form.form-horizontal
     .col-md-12
       h4.step-title #{title} App Settings
       .form-group
-        label(for!='#{id}Enable').col-sm-2.control-label Enable #{title}
-        .col-sm-8.checkbox
-          label
-            input(type='checkbox', id!='#{id}Enable').checkboxEnable.app-enable
-            |  Enabled
+        label(for!='#{id}Enabled').col-sm-2.control-label Enable #{title}
+        .col-sm-8
+          .row
+            .btn-group(role='group').btn-group-sm.col-md-12
+              button(type='button', aria-label='Yes', data-model='enabled', data-value='true').app-enable.btn.btn-default.col-md-3.btn-switch-usenet Enabled
+              button(type='button', aria-label='No', data-model='enabled', data-value='false').app-enable.btn.btn-default.col-md-3.btn-switch-usenet.active Disabled
       .form-group
         label(for!='#{id}Host').col-sm-2.control-label IP/Host Address
         .col-sm-8
@@ -32,8 +33,9 @@ form.form-horizontal
           span(id!='#{id}ApiKeyHelp').help-block The API key can be found in the #{title} #{apiUiLocation}.
       .form-group
         label(for!='#{id}SSLEnable').col-sm-2.control-label Use SSL/HTTPS
-        .col-sm-8.checkbox
-          label
-            input(type='checkbox', id!='#{id}SSLEnable', aria-describedby!='#{id}SSLEnableHelp', disabled).checkboxEnable.app-use-ssl
-            span.help-block.help-block-checkbox Enabled
+        .col-sm-8
+          .row
+            .btn-group(role='group').btn-group-sm.col-md-12
+              button(type='button', aria-label='Yes', data-model!='#{id}SSLEnable', data-value='true', disabled).app-use-ssl.btn.btn-default.col-md-3.btn-switch Yes
+              button(type='button', aria-label='No', data-model!='#{id}SSLEnable', data-value='false', disabled).app-use-ssl.btn.btn-default.col-md-3.btn-switch.active No
           span(id!='#{id}SSLEnableHelp').help-block Use if you have SSL enabled on your #{title} server.

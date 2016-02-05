@@ -1,0 +1,29 @@
+form.form-horizontal
+  .row
+    .col-md-12
+      h4.step-title Forecast.io Api Settings
+      .form-group
+        label(for='forecastApiKey').col-sm-2.control-label Api Key
+        .col-sm-8
+          input(type='text', placeholder='Forecast.io Api Key', aria-describedby='forecastApiKeyHelp').form-control#forecastApiKey
+          span.help-block#forecastApiKeyHelp Don't have one? 
+            a(href='https://developer.forecast.io/') Get one here
+      .form-group
+        label(for='forecastLatitude').col-sm-2.control-label Latitude
+        .col-sm-8
+          input(type='text', placeholder='Default Latitude').form-control#forecastLatitude
+      .form-group
+        label(for='forecastLongitude').col-sm-2.control-label Longitude
+        .col-sm-8
+          input(type='number', placeholder='Default Longitude').form-control#forecastLongitude
+      .form-group
+        .col-sm-8.col-sm-push-2
+          button(role='button').btn.btn-default.btn-sm.btn-get-location Use Current Location
+
+      .form-group
+        label.col-sm-2.control-label Degree Unit
+        .col-sm-8
+          .row
+            .btn-group(role='group').btn-group-sm.col-md-8
+              button(type='button', aria-label='Enable', data-model='forecastDegree', data-value='f').btn.btn-default.btn-switch.col-md-6.active Fahrenheit (&#x2109;)
+              button(type='button', aria-label='Disable', data-model='forecastDegree', data-value='c').btn.btn-default.btn-switch.col-md-6 Celsius (&#x2103;)

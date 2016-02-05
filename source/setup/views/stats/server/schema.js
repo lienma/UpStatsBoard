@@ -1,6 +1,5 @@
 import _ from 'underscore';
-
-export default (self) => {
+export default function ServerSchema(self) {
 
 	var isRemote = () => { return self.model.get('remote'); };
 	var isAuthentication = (type) => { return () => { return isRemote() && self.model.get('authentication') === type; }; };
@@ -11,9 +10,7 @@ export default (self) => {
 			el: '#addServerLabel',
 			constraints: {
 				required: [true, 'A unique server name is required.'],
-				func: [function (value) {
-					return self.view.servers.where({ label: value }).length === 0 || _.isObject(self.oldModel);
-				}, 'The server name is already being used.'],
+				func: [(value) => (self.view.servers.where({ label: value }).length === 0 || _.isObject(self.oldModel)), 'The server name is already being used.'],
 				lessThan: [41, 'Max length of the name can only be 40 characters.']
 			}
 		},

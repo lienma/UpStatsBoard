@@ -31,6 +31,8 @@ class TabModel extends Backbone.Model {
 				this.set('success', false);
 			}
 		});
+
+		this.listenTo(this.data, 'change', (model) => this.collection.AppData.set(model.attributes) );
 	}
 
 	get isCurrent() { return this.get('current'); }

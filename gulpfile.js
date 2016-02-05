@@ -40,6 +40,7 @@ gulp.task('lint', function () {
 gulp.task('scripts-setup', ['lint'], function() {
 	return browserify({ debug: true })
 		.transform(babelify)
+		//.transform({ global: true, ignore: 'source/**/*.jade' }, 'uglifyify')
 		.external(externalLibraries)
 		.require('source/setup/app.js', { entry: true })
 		.bundle()
@@ -75,6 +76,9 @@ gulp.task('vender-fonts', function () {
 
 gulp.task('watch', function () {
 	livereload.listen();
-	gulp.watch('source/setup/**/*.js', ['scripts-setup']);
+	gulp.watch([
+		'source/setup/**/*.jade',
+		'source/setup/**/*.js'
+	], ['scripts-setup']);
 });
 

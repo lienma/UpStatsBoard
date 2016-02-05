@@ -7,6 +7,7 @@ var bodyParser 		= require('body-parser')
   , cookieParser	= require('cookie-parser')
   , csrf			= require('csurf')
   , errorHandler	= require('errorhandler')
+  , favicon         = require('express-favicon')
   , methodOverride	= require('method-override')
   , minify 			= require('express-minify')
   , morganLogger	= require('morgan')
@@ -44,6 +45,8 @@ function setupMiddleware(upsboardApp) {
 			upsboardApp.use(morganLogger('dev'));
 		}
 	}
+
+	upsboardApp.use(favicon(paths.public + '/favicon.ico'));
 
 	if(upsboardApp.get('env') !== 'development') {
 		upsboardApp.use(minify());

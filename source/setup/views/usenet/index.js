@@ -34,6 +34,13 @@ export default BaseTab({
 					}
 				});
 
+				this.listenTo(app.model, 'change', (model) => {
+					let key = 'usenet.' + app.id + '.';
+					_.each(model.attributes, (value, id) => {
+						this.set(key + id, value);
+					});
+				});
+
 				this.listenTo(app.model.errors, 'update', this.updateOnErrors);
 			});
 		});
@@ -128,5 +135,7 @@ export default BaseTab({
 				this.resetTestConnectionBtn();
 			});
 		});
+
+		this.updateTestConnectionBtn();
 	}
 });

@@ -40,6 +40,8 @@ class Collection extends Backbone.Collection {
 		let previousModel = this.at(pos - 1);
 
 		if(previousModel) {
+			console.log(this, previousModel);
+			previousModel.pane.openLast();
 			this.setCurrent(previousModel.id);
 		}
 	}

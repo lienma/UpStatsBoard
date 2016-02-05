@@ -15,10 +15,11 @@ form.form-horizontal
             small Note: Default port number for Plex Media Server is 32400.
       .form-group
         label(for='plexMediaServerSSLEnable').col-sm-2.control-label Use SSL/HTTPS
-        .col-sm-8.checkbox
-          label
-            input(type='checkbox', aria-describedby='plexMediaServerSSLEnableHelp').checkboxEnable#plexMediaServerSSLEnable
-            span.help-block.help-block-checkbox Enabled
+        .col-sm-8
+          .row
+            .btn-group(role='group').btn-group-sm.col-md-12
+              button(type='button', aria-label='Yes', data-model='plexMediaServerSSLEnable', data-value='true').btn.btn-default.col-md-3.btn-switch.active Yes
+              button(type='button', aria-label='No', data-model='plexMediaServerSSLEnable', data-value='false').btn.btn-default.col-md-3.btn-switch No
           span.help-block#plexMediaServerSSLEnableHelp Use if you have SSL enabled on your Plex Media Server.
       .form-group
         .col-sm-8.col-sm-push-2
@@ -45,8 +46,9 @@ form.form-horizontal
             button(role='button', data-type='artist', data-field='plexDefaultMusic', disabled).btn.btn-default.btn-xs.btn-plex-pick-library.btn-plex-pick-tv-show Click here to pick library.
        .form-group
         label(for='plexMediaServerUseBIF').col-sm-2.control-label Use Video Preview Thumbnails (BIF)
-        .col-sm-8.checkbox
-          label
-            input(type='checkbox', aria-describedby='plexMediaServerUseBIFHelp', data-model-field='plexUseBIF').checkboxEnable#plexMediaServerUseBIF
-            span.help-block.help-block-checkbox Enabled
+        .col-sm-8
+          .row
+            .btn-group(role='group').btn-group-sm.col-md-12
+              button(type='button', aria-label='Yes', data-model='plexMediaServerUseBIF', data-value='true').btn.btn-default.col-md-3.btn-switch.active Enable
+              button(type='button', aria-label='No', data-model='plexMediaServerUseBIF', data-value='false').btn.btn-default.col-md-3.btn-switch Disable
           span.help-block#plexMediaServerUseBIFHelp If you have media indexing enabled on your server, use these on the activity pane.

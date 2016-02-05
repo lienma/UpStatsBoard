@@ -13,9 +13,10 @@ class AppSelectorView extends Backbone.View {
 		this.apps.forEach((app) => {
 
 			this[app.id] = new ViewSelectItem({
+				app: app,
 				parentPane: this,
 				id: app.id,
-				location: [Config.setup.webRoot, 'step', this.parentPane.basePane.id, this.parentPane.model.id, app.id].join('/'),
+				location: [Config.setup.webRoot, 'setup', this.parentPane.basePane.id, this.parentPane.model.id, app.id].join('/'),
 				title: app.title
 			});
 			this[app.id].app = app;
@@ -26,21 +27,14 @@ class AppSelectorView extends Backbone.View {
 		let app = this[id];
 
 		if(this._currentApp === app) {
-			app.app.close(() => {
-				app.toggleClass(false);
-				this._currentApp = false;
-			});
+			app.app.close(() => this._currentApp = false );
 		} else {
 			if(this._currentApp) {
 				this._currentApp.app.close(() => {
-					this._currentApp.toggleClass(false);
-
-					app.toggleClass(true);
 					this._currentApp = this[id];
 					app.app.open();
 				});
 			} else {
-				app.toggleClass(true);
 				this._currentApp = this[id];
 				app.app.open();
 			}
@@ -51,8 +45,9 @@ class AppSelectorView extends Backbone.View {
 		this.$el.html(this.template({ title: this.title }));
 
 		this.apps.forEach((app) => {
-			this[app.id].render();
-			this.$('.wizard-select-services').append(this[app.id].$el);
+			let appView = this[app.id];
+			appView.render();
+			this.$('.wizard-select-services').append(appView.$el);
 		});
 
 		return this;

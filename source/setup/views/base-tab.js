@@ -5,6 +5,7 @@ import Validator         from '../utils/validator';
 import TemplateSubTabs   from '../templates/view-wizard.jade';
 import CollectionSubTabs from '../collections/sub-tabs';
 import ViewSubTabBtn     from '../views/btn-sub-tab';
+import Notify            from '../utils/notify';
 
 function BaseTab(stepOptions) {
 	const ContainsSubTabs = (stepOptions.SubTabs && stepOptions.SubTabs.length > 0);
@@ -21,6 +22,7 @@ function BaseTab(stepOptions) {
 			this.pane = options.pane;
 			this.dataSchema = stepOptions.dataSchema || {};
 			this.templateVars = stepOptions.templateVars || {};
+			this.AppData = options.AppData;
 
 			this.get = this.model.data.get.bind(this.model.data);
 			this.set = this.model.data.set.bind(this.model.data);
@@ -28,6 +30,13 @@ function BaseTab(stepOptions) {
 			this.validator = new Validator({ dataSchema: this.dataSchema, body: this.$el });
 			this.listenTo(this.validator, 'error', this.updateErrorModel);
 			this.listenTo(this.validator, 'update', (id, value) => this.set(id, value) );
+
+			_.each(this.dataSchema, (data, id) => {
+				let def = data.default;
+				def = (def === undefined) ? '' : def;
+				this.set(id, def);
+				this.AppData.set(id, def);
+			});
 
 			if(ContainsSubTabs) {
 				this.template = TemplateSubTabs;
@@ -98,12 +107,16 @@ function BaseTab(stepOptions) {
 		clickNextStep: function (e) {
 			e.preventDefault();
 
-			if(this.validate()) {
+			let btn = $(e.target);
+			let valid = (ContainsSubTabs) ? this.currentTab().validate() : this.validate();
+
+
+			if(valid) {
 				this.pane.nextStep();
 			} else {
-				$(e.target).parent().effect('shake');
+				Notify.failed('Validation failed. Check fields and try again.');
 			}
-			$(e.target).blur();
+			btn.blur();
 		},
 
 		nextStep: function () {

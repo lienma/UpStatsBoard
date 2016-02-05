@@ -1,23 +1,21 @@
 import Backbone from 'backbone';
 
-var ErrorModel = Backbone.Model.extend({
-	defaults: {
+class ErrorModel extends Backbone.Model {
+	get defaults() { return {
 		msg: ''
-	}
-});
+	}; }
+}
 
 class AppModel extends Backbone.Model {
-	get default() {
-		return {
-			enabled: false,
-			selected: false,
-			host: '',
-			port: null,
-			webRoot: '/',
-			apiKey: '',
-			useSSL: false
-		};
-	}
+	get defaults() { return {
+		enabled: false,
+		selected: false,
+		host: '',
+		port: null,
+		webRoot: '',
+		apiKey: '',
+		useSSL: false
+	}; }
 
 	constructor(options) {
 		super(options);

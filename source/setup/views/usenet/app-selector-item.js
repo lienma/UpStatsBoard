@@ -10,8 +10,10 @@ class SelctorItemView extends Backbone.View {
 		this.id         = options.id;
 		this.location   = options.location;
 		this.title      = options.title;
+		this.app        = options.app;
 
 		this.$el.click(this.click.bind(this));
+		this.listenTo(this.app.model, 'change:selected', this.updateSelected);
 	}
 
 	click(e) {
@@ -21,6 +23,10 @@ class SelctorItemView extends Backbone.View {
 
 	toggleClass(hasClass) {
 		this.$el.toggleClass('wizard-select-service-selected', hasClass);
+	}
+
+	updateSelected(model) {
+		this.toggleClass(model.get('selected'));
 	}
 
 	render() {
