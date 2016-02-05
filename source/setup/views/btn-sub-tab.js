@@ -6,6 +6,7 @@ import Template  from '../templates/btn-sub-tab.jade';
 class SubTabBtn extends Backbone.View {
 	get tagName() { return 'li'; }
 	get template() { return Template; }
+	get hasApps() { return this.apps.length > 0; }
 
 	initialize(options) {
 		this._hasRendered = false;
@@ -145,7 +146,13 @@ class SubTabBtn extends Backbone.View {
 	}
 
 	updateTabAppIcon(model) {
-		this.apps.forEach((app) => this.$('.tab-app').toggleClass('icos-' + model.id, model.isEnabled) );
+		this.apps.forEach((app) => {
+			this.$('.tab-app').toggleClass('icos-' + app.id, model.get('enabled'));
+
+			if(model.get('enabled')) {
+				this._tabIcon = app.id;
+			}
+		});
 		this.updateTabForErrors(model);
 	}
 
@@ -154,7 +161,7 @@ class SubTabBtn extends Backbone.View {
 		this.$el.prop('role', 'presentation');
 
 		this.$el.html(this.template({
-			location: Config.setup.webRoot + '/setup/' + this.basePane.id + '/' + this.model.id,
+			location: [Config.setup.webRoot, 'setup', this.basePane.id, this.model.id].join('/'),
 			target: this.basePane.id + '-' + this.model.id,
 			title: this.model.get('title')
 		}));
@@ -165,7 +172,11 @@ class SubTabBtn extends Backbone.View {
 		});
 
 		this.$('a').on('hide.bs.tab', (e) => {
-			this.parentPane.currentTab().validate();
+			const valid = this.parentPane.currentTab().validate();
+
+			if(this.hasApps) {
+				this.updateTabForAppErrors();
+			}
 		});
 
 		if(this._tabIcon !== '') {
