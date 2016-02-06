@@ -1,7 +1,5 @@
-var nib				= require('nib')
-  , path 			= require('path')
-  , Promise			= require('bluebird')
-  , stylus			= require('stylus');
+var path 			= require('path')
+  , Promise			= require('bluebird');
 
 var bodyParser 		= require('body-parser')
   , cookieParser	= require('cookie-parser')
@@ -35,8 +33,6 @@ function setupMiddleware(upsboardApp) {
 	upsboardApp.use(cookieParser());
 	//app.use(app.sessions.create());
 	//app.use(csrf());
-	
-	upsboardApp.use(stylus.middleware({src: paths.public, compile: function (str, path) { return stylus(str).set('filename', path).use(nib()); }}));
 
 	if (logging !== false) {
 		if(upsboardApp.get('env') !== 'development') {

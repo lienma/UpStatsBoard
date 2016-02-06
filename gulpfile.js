@@ -7,6 +7,7 @@ var browserify = require('browserify');
 var babelify   = require('babelify');
 var eslint     = require('gulp-eslint');
 var livereload = require('gulp-livereload');
+var stylus     = require('gulp-stylus');
 var concatCss  = require('gulp-concat-css');
 var minifyCss  = require('gulp-minify-css');
 
@@ -14,13 +15,10 @@ var Package = JSON.parse(fs.readFileSync('./package.json'));
 var externalLibraries = _.keys(Package.browser);
 
 
-gulp.task('build', ['clean', 'scripts-setup', 'build-vendor'], function () {
+gulp.task('build', ['clean', 'build-setup', 'build-vendor']);
 
-});
-
-gulp.task('build-vendor', ['vendor-scripts', 'vendor-css', 'vender-fonts'], function () {
-
-});
+gulp.task('build-setup', ['setup-scripts', 'setup-css']);
+gulp.task('build-vendor', ['vendor-scripts', 'vendor-css', 'vender-fonts']);
 
 gulp.task('clean', function () {
 	return del([
@@ -37,7 +35,25 @@ gulp.task('lint', function () {
 		.pipe(eslint.failAfterError());
 });
 
-gulp.task('scripts-setup', ['lint'], function() {
+gulp.task('setup-css', ['setup-css-bundle'], function () {
+	return del('build/stylesheet/setup');
+});
+
+
+gulp.task('setup-css-bundle', ['setup-css-compile'], function () {
+	return gulp.src('build/stylesheet/setup/*.css')
+		.pipe(concatCss('setup.bundle.css'))
+		.pipe(gulp.dest('build/stylesheet/'));
+});
+
+gulp.task('setup-css-compile', function () {
+	return gulp.src(['source/setup/stylesheets/*.styl', 'source/shared/stylesheets/*.styl'])
+		.pipe(stylus())
+		.pipe(gulp.dest('build/stylesheet/setup'));
+});
+
+
+gulp.task('setup-scripts', ['lint'], function () {
 	return browserify({ debug: true })
 		.transform(babelify)
 		//.transform({ global: true, ignore: 'source/**/*.jade' }, 'uglifyify')
