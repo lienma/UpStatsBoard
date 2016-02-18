@@ -8,6 +8,8 @@ $(() => {
 
     app.setData({
     	'settings': {
+            'appBindAddress': 'usenet.server',
+            'appPortNumber': 18024,
     		'appRequireLogin': false,
 
     		'appAdminEmail': 'no-reply@upsboard.xyz',
@@ -32,10 +34,20 @@ $(() => {
     			'useSSL': true
     		},
 
-
-    		//'couchpotato': {
-    		//	'enabled': true
-    		//}
+            'couchpotato': {
+                'enabled': true,
+                'host': 'usenet.server',
+                'port': 10003,
+                'apiKey': 'aa',
+                'useSSL': true
+            },
+            'headphones': {
+                'enabled': true,
+                'host': 'usenet.server',
+                'port': 10004,
+                'apiKey': 'aa',
+                'useSSL': true
+            },
     	},
     	'plex': {
     		'plextv': {
@@ -82,5 +94,5 @@ $(() => {
     });
 
     app.render();
-    app.open('usenet/tvshow');
+    app.open('overview');
 });

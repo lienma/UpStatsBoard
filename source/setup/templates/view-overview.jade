@@ -1,1 +1,116 @@
-this is the overview
+.row(style='margin-top: 15px')
+  .col-md-6
+    .panel.panel-default
+      .panel-heading
+        h4.panel-title.panel-title-small App Settings
+      .panel-body.overview-table
+        .ov-row
+          .ov-label Binding Address:
+          .ov-item(data-type='text', data-field='appBindAddress')
+        .ov-row
+          .ov-label Binding Port:
+          .ov-item(data-type='boolean', data-field='appPortNumber')
+        .ov-row
+          .ov-label Web Root:
+          .ov-item(data-type='text', data-field='appWebRoot')
+        .ov-row
+          .ov-label Log http Requests:
+          .ov-item(data-type='enabled', data-field='appLogHttpRequests')
+        .ov-row
+          .ov-label Check for Updates:
+          .ov-item(data-type='enabled', data-field='appCheckForUpdates')
+        .ov-row
+          .ov-label Automatically Update:
+          .ov-item(data-type='enabled', data-field='appAutoUpdate')
+        .ov-row
+          .ov-label Require Login:
+          .ov-item(data-type='enabled', data-field='appRequireLogin')
+
+    .panel.panel-default.no-bottom-margin
+      .panel-heading
+        h4.panel-title.panel-title-small Plex.tv Account Information
+      .panel-body.overview-table
+        .ov-row
+          .ov-label Username:
+          .ov-item(data-type='text', data-field='plexTvUsername')
+        .ov-row
+          .ov-label Password:
+          .ov-item(data-type='password', data-field='plexTvPassword')
+
+
+  .col-md-6
+    .panel.panel-default
+      .panel-heading
+        h4.panel-title.panel-title-small Admin Account Information
+      .panel-body.overview-table
+        .ov-row
+          .ov-label Username:
+          .ov-item(data-type='text', data-field='appAdminUsername')
+        .ov-row
+          .ov-label Email Address:
+          .ov-item(data-type='email', data-field='appAdminEmail')
+        .ov-row
+          .ov-label Password:
+          .ov-item(data-type='password', data-field='appAdminPassword')
+
+    .panel.panel-default.no-bottom-margin
+      .panel-heading
+        h4.panel-title.panel-title-small Enabled Usenet Apps
+      .panel-body
+        .overview-usenet-apps
+          a.ov-usenet-app.overview-usenet-sabnzbd
+            i.icos.icos-36.icos-sabnzbd
+          a.ov-usenet-app.overview-usenet-sonarr
+            i.icos.icos-36.icos-sonarr
+          a.ov-usenet-app.overview-usenet-sickbeard
+            i.icos.icos-36.icos-sickbeard
+          a.ov-usenet-app.overview-usenet-couchpotato
+            i.icos.icos-36.icos-couchpotato
+          a.ov-usenet-app.overview-usenet-headphones
+            i.icos.icos-36.icos-headphones
+        div.overview-usenet-sabnzbd
+          h5.step-title.no-bottom-margin SABnzbd+ Settings
+          .overview-table
+            .ov-row
+              .ov-label Address:
+              .ov-item(data-type='link', data-field='func', data-app='sabnzbd')
+            .ov-row
+              .ov-label API Key:
+              .ov-item(data-type='apiKey', data-field='usenet.sabnzbd.apiKey')
+        div.overview-usenet-sonarr
+          h5.step-title.no-bottom-margin Sonarr Settings
+          .overview-table
+            .ov-row
+              .ov-label Address:
+              .ov-item(data-type='link', data-field='func', data-app='sonarr')
+            .ov-row
+              .ov-label API Key:
+              .ov-item(data-type='apiKey', data-field='usenet.sonarr.apiKey')
+        div.overview-usenet-sickbeard
+          h5.step-title.no-bottom-margin Sick Beard Settings
+          .overview-table
+            .ov-row
+              .ov-label Address:
+              .ov-item(data-type='link', data-field='func', data-app='sickbeard')
+            .ov-row
+              .ov-label API Key:
+              .ov-item(data-type='apiKey', data-field='usenet.sickbeard.apiKey')
+        div.overview-usenet-couchpotato
+          h5.step-title.no-bottom-margin CouchPotato Settings
+          .overview-table
+            .ov-row
+              .ov-label Address:
+              .ov-item(data-type='link', data-field='func', data-app='couchpotato')
+            .ov-row
+              .ov-label API Key:
+              .ov-item(data-type='apiKey', data-field='usenet.couchpotato.apiKey')
+        div.overview-usenet-headphones
+          h5.step-title.no-bottom-margin Headphones Settings
+          .overview-table
+            .ov-row
+              .ov-label Address:
+              .ov-item(data-type='link', data-field='func', data-app='headphones')
+            .ov-row
+              .ov-label API Key:
+              .ov-item(data-type='apiKey', data-field='usenet.headphones.apiKey')
+

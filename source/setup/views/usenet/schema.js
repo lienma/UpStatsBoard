@@ -21,7 +21,8 @@ export default {
 	},
 
 	'webRoot': {
-		el: '.app-web-root'
+		el: '.app-web-root',
+		default: '/'
 	},
 
 	'apiKey': {

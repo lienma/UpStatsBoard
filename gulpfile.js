@@ -1,22 +1,23 @@
 var _          = require('lodash')
 var fs         = require('fs');
 var gulp       = require('gulp');
+var Promise	   = require('bluebird')
 var source     = require('vinyl-source-stream');
 var del        = require('del');
 var browserify = require('browserify');
 var babelify   = require('babelify');
+var cssnano    = require('gulp-cssnano');
 var eslint     = require('gulp-eslint');
 var livereload = require('gulp-livereload');
 var stylus     = require('gulp-stylus');
 var concatCss  = require('gulp-concat-css');
-var minifyCss  = require('gulp-minify-css');
+var sourcemaps = require('gulp-sourcemaps');
 
 var Package = JSON.parse(fs.readFileSync('./package.json'));
 var externalLibraries = _.keys(Package.browser);
 
 
 gulp.task('build', ['clean', 'build-setup', 'build-vendor']);
-
 gulp.task('build-setup', ['setup-scripts', 'setup-css']);
 gulp.task('build-vendor', ['vendor-scripts', 'vendor-css', 'vender-fonts']);
 
@@ -43,6 +44,9 @@ gulp.task('setup-css', ['setup-css-bundle'], function () {
 gulp.task('setup-css-bundle', ['setup-css-compile'], function () {
 	return gulp.src('build/stylesheet/setup/*.css')
 		.pipe(concatCss('setup.bundle.css'))
+		.pipe(sourcemaps.init())
+		.pipe(cssnano())
+		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest('build/stylesheet/'));
 });
 
@@ -79,6 +83,9 @@ gulp.task('vendor-css', function () {
 
 	return gulp.src(cssFiles)
 		.pipe(concatCss('vendor.bundle.css'))
+		.pipe(sourcemaps.init())
+		.pipe(cssnano())
+		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest('build/stylesheet/'));
 });
 

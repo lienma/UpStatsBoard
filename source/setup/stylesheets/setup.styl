@@ -7,6 +7,9 @@
 .padding-left-5
 	padding-left 5px
 
+.padding-left-10
+	padding-left 10px
+
 .padding-right-5
 	padding-right 5px
 
@@ -16,12 +19,54 @@
 .normal
 	font-weight normal
 
+.smaller
+	font-size 70% !important
+
 .bold
 	font-weight bold
 
 .bold-center
 	text-align center
 	font-weight bold
+
+.panel-title-small
+	font-size small
+
+.overview-table
+	padding 10px
+	.ov-row
+		padding-left 10px
+		padding-right 10px
+	.ov-label
+		text-align right
+		font-weight bold
+		width 33%
+	.ov-item
+		width 67%
+	.ov-label, .ov-item
+		border-bottom 1px solid #ddd
+		float left
+		line-height 25px
+		height 25px
+		padding-left 5px
+		font-size small
+	.ov-row:last-child
+		.ov-label, .ov-item
+			border-bottom none
+
+
+.overview-usenet-apps
+	text-align center
+
+	.ov-usenet-app
+		background-color #f3f3f3
+		display inline-block
+		padding 10px
+		border 1px solid #ddd
+		border-radius 10px
+		line-height normal
+		cursor pointer
+		margin 5px
 
 .no-margin
 	margin 0 !important
@@ -187,6 +232,7 @@ ul.tooltip-errors-list
 						small
 							padding-left 10px
 .wizard
+	background-color rgba(255, 255, 255, .6)
 	.wizard-tabs
 		margin 0
 		padding 0
@@ -326,9 +372,8 @@ ul.tooltip-errors-list
 		display block
 
 	.panel-body
-		padding-top 0
-
 		.step-title
+			font-family Alegreya Sans,sans-serif
 			border-bottom 1px solid #ddd
 
 	.bottom-btn-row
