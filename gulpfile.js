@@ -1,47 +1,49 @@
-var _          = require('lodash')
-var fs         = require('fs');
-var gulp       = require('gulp');
-var Promise	   = require('bluebird')
-var source     = require('vinyl-source-stream');
-var del        = require('del');
-var browserify = require('browserify');
-var babelify   = require('babelify');
-var cssnano    = require('gulp-cssnano');
-var eslint     = require('gulp-eslint');
-var livereload = require('gulp-livereload');
-var stylus     = require('gulp-stylus');
-var concatCss  = require('gulp-concat-css');
-var sourcemaps = require('gulp-sourcemaps');
+const _          = require('lodash')
+const fs         = require('fs');
+const gulp       = require('gulp');
+const Promise	 = require('bluebird');
+const source     = require('vinyl-source-stream');
+const del        = require('del');
+const browserify = require('browserify');
+const babelify   = require('babelify');
+const cssnano    = require('gulp-cssnano');
+const eslint     = require('gulp-eslint');
+const livereload = require('gulp-livereload');
+const stylus     = require('gulp-stylus');
+const concatCss  = require('gulp-concat-css');
+const sourcemaps = require('gulp-sourcemaps');
+const replace    = require('gulp-replace');
 
-var Package = JSON.parse(fs.readFileSync('./package.json'));
-var externalLibraries = _.keys(Package.browser);
+
+const Package = JSON.parse(fs.readFileSync('./package.json'));
+const externalLibraries = _.keys(Package.browser);
 
 
 gulp.task('build', ['clean', 'build-setup', 'build-vendor']);
 gulp.task('build-setup', ['setup-scripts', 'setup-css']);
 gulp.task('build-vendor', ['vendor-scripts', 'vendor-css', 'vender-fonts']);
 
-gulp.task('clean', function () {
+gulp.task('clean', () => {
 	return del([
-		'build/fonts',
-		'build/javascript',
-		'build/stylesheet'
+		'build/fonts/**',
+		'build/javascript/**',
+		'build/stylesheet/**'
 	]);
 });
 
-gulp.task('lint', function () {
+gulp.task('lint', () => {
 	return gulp.src(['source/**/*.js', '!source/vendors/**'])
 		.pipe(eslint())
 		.pipe(eslint.format())
 		.pipe(eslint.failAfterError());
 });
 
-gulp.task('setup-css', ['setup-css-bundle'], function () {
+gulp.task('setup-css', ['setup-css-bundle'], () => {
 	return del('build/stylesheet/setup');
 });
 
 
-gulp.task('setup-css-bundle', ['setup-css-compile'], function () {
+gulp.task('setup-css-bundle', ['setup-css-compile'], () => {
 	return gulp.src('build/stylesheet/setup/*.css')
 		.pipe(concatCss('setup.bundle.css'))
 		.pipe(sourcemaps.init())
@@ -50,14 +52,14 @@ gulp.task('setup-css-bundle', ['setup-css-compile'], function () {
 		.pipe(gulp.dest('build/stylesheet/'));
 });
 
-gulp.task('setup-css-compile', function () {
+gulp.task('setup-css-compile', () => {
 	return gulp.src(['source/setup/stylesheets/*.styl', 'source/shared/stylesheets/*.styl'])
 		.pipe(stylus())
 		.pipe(gulp.dest('build/stylesheet/setup'));
 });
 
 
-gulp.task('setup-scripts', ['lint'], function () {
+gulp.task('setup-scripts', ['lint'], () => {
 	return browserify({ debug: true })
 		.transform(babelify)
 		//.transform({ global: true, ignore: 'source/**/*.jade' }, 'uglifyify')
@@ -70,7 +72,7 @@ gulp.task('setup-scripts', ['lint'], function () {
 		.pipe(livereload());
 });
 
-gulp.task('vendor-scripts', function () {
+gulp.task('vendor-scripts', () => {
 	return browserify({ debug: true })
 		.require(externalLibraries)
 		.bundle()
@@ -78,26 +80,24 @@ gulp.task('vendor-scripts', function () {
 		.pipe(gulp.dest('build/javascript/'));
 });
 
-gulp.task('vendor-css', function () {
-	var cssFiles = _.values(Package['browser-css']);
+gulp.task('vendor-css', () => {
+	const cssFiles = _.values(Package['browser-css']);
 
 	return gulp.src(cssFiles)
 		.pipe(concatCss('vendor.bundle.css'))
 		.pipe(sourcemaps.init())
+		.pipe(replace(/..\/..\/..\/font-awesome\//g, '/'))
 		.pipe(cssnano())
 		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest('build/stylesheet/'));
 });
 
-gulp.task('vender-fonts', function () {
-	var srcFiles = _.map(Package['browser-font'], function (font) {
-		return font + '**/*.{ttf,woff,woff2,eof,svg,otf}';
-	});
-	return gulp.src(srcFiles)
-		.pipe(gulp.dest('build/fonts/'));
+gulp.task('vender-fonts', () => {
+	const srcFiles = _.map(Package['browser-font'], (font) => font + '**/*.{ttf,woff,woff2,eof,svg,otf}' );
+	return gulp.src(srcFiles).pipe(gulp.dest('build/fonts/'));
 });
 
-gulp.task('watch', function () {
+gulp.task('watch', () => {
 	livereload.listen();
 	gulp.watch([
 		'source/setup/**/*.jade',

@@ -1,6 +1,7 @@
 td
   span.bold #{label} 
   small ( #{location} )
+td.text-center.os-icon
 td.text-center #{remote}
 td.text-center #{monitorCpu}
 td.text-center #{monitorMemory}
@@ -12,6 +13,6 @@ td.text-center #{drives}
 td
   .btn-group.btn-group-xs(role='group')
     button(type='button', title='Edit Server', data-placement='left').btn.btn-default.btn-tooltip.btn-edit-server
-      span(aria-hidden='true').glyphicon.glyphicon-cog
+      span(aria-hidden='true').fa.fa-pencil
      button(type='button', title='Delete Server', data-placement='right').btn.btn-default.btn-tooltip.btn-delete-server
       span(aria-hidden='true').glyphicon.glyphicon-trash

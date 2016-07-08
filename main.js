@@ -1,7 +1,6 @@
 var chalk 			= require('chalk')
   , express 		= require('express')
-  , path			= require('path')
-  , os				= require('os');
+  , path			= require('path');
 
 var appRoot			= path.resolve(__dirname)
   , paths			= require(appRoot + '/core/paths');
@@ -13,14 +12,16 @@ var upsboard 		= require(paths.core)
 var app				= express();
     app.dir			= path.resolve(__dirname);
 
-app.set('seed', Math.floor(Math.random() * (process.pid - 1000) + 1000));
-
-if(os.type() == 'Windows_NT') {
-	console.fatal('UpsBoard only works on Linux operating system, and also Mac with limited features.');
+if(!upsboard.os || upsboard.os === 'windows') {
+	console.log(chalk.red('UpsBoard only works on Linux operating system, and also Mac with limited features.'));
+	console.log(chalk.red('Windows is currently unsupported at this time.'));
 	process.exit(0);
 }
 
+app.set('seed', Math.floor(Math.random() * (process.pid - 1000) + 1000));
+
 log.info('Starting', chalk.yellow('UpsBoard'), 'in', app.get('env'), 'environment.');
+log.info('Operating system:', chalk.cyan(upsboard.os))
 
 upsboard().then(function(upsServer) {
 	app.use(upsServer.rootApp.get('webRoot'), upsServer.rootApp);

@@ -30,19 +30,23 @@ const dataSchema = {
 	},
 
 	'appLogHttpRequests': {
-		default: true
+		default: true,
+		isButtonGroup: true
 	},
 
 	'appCheckForUpdates': {
-		default: true
+		default: true,
+		isButtonGroup: true
 	},
 
 	'appAutoUpdate': {
-		default: true
+		default: true,
+		isButtonGroup: true
 	},
 
 	'appRequireLogin': {
-		default: true
+		default: true,
+		isButtonGroup: true
 	},
 
 	'appAdminEmail': {

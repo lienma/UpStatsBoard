@@ -5,6 +5,7 @@ block stylesheet
 
 block script
   script(type='text/javascript') Config.uuid = '#{locals.uuid}';
+  script(type='text/javascript') Config.os = #{locals.os};
   script(type='text/javascript') Config.setup = { host: '#{locals.host}', port: #{locals.port}, webRoot: '#{locals.webRoot}' };
   script(src=locals.webRoot + '/javascript/setup.bundle.js')
 

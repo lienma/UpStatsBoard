@@ -26,7 +26,8 @@ const DataSchema = {
 	},
 
 	'forecastDegree':{
-		default: 'f'
+		default: 'f',
+		isButtonGroup: true
 	}
 }
 

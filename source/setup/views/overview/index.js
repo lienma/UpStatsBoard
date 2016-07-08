@@ -35,16 +35,26 @@ export default BaseTab({
 			return this.AppData.get(key);
 		};
 
+		let protocol, host, port, webRoot;
+
 		switch(app) {
 			case 'couchpotato':
 			case 'headphones':
 			case 'sabnzbd':
 			case 'sickbeard':
 			case 'sonarr':
-				const protocol = get(`usenet.${app}.useSSL`) ? 'https' : 'http';
-				const host = get(`usenet.${app}.host`);
-				const port = get(`usenet.${app}.port`) === 80 ? '' : ':' + get(`usenet.${app}.port`);
-				const webRoot = get(`usenet.${app}.webRoot`) === '' ? '/' : get(`usenet.${app}.webRoot`);
+				const usenet = `usenet.${app}`;
+				protocol = get(`${usenet}.useSSL`) ? 'https' : 'http';
+				host = get(`${usenet}.host`);
+				port = get(`${usenet}.port`) === 80 ? '' : ':' + get(`${usenet}.port`);
+				webRoot = get(`${usenet}.webRoot`) === '' ? '/' : get(`${usenet}.webRoot`);
+				return `${protocol}://${host}${port}${webRoot}`;
+
+			case 'plexpy':
+				protocol = get('plexPyUseSSL') ? 'https' : 'http';
+				host = get(`plexPyHost`);
+				port = get(`plexPyPort`) === 80 ? '' : ':' + get(`plexPyPort`);
+				webRoot = get(`plexPyWebRoot`) === '' ? '/' : get(`plexPyWebRoot`);
 				return `${protocol}://${host}${port}${webRoot}`;
 		}
 	},
@@ -62,22 +72,24 @@ export default BaseTab({
 		}
 	},
 
-	_updateField: function (field) {
-		const element = this.$('[data-field="' + field + '"]');
+	_updateField: function (element, field) {
 		return () => {
-console.log('asdfsad')
+console.log(this.AppData);
 			let value = this.AppData.get(field);
+//console.log('field', field, value)
 
 			if(field === 'func') {
-				const app = element.data('app');
-				value = this._buildFieldValue(app);
+				value = this._buildFieldValue(element.data('app'));
 			}
 
+			if(value === '' && element.data('empty') !== '') {
+				value = element.data('empty');
+			}
 
 			switch(element.data('type')) {
 				case 'apiKey':
 				case 'email':
-				case 'boolean':
+				case 'number':
 					element.html('<i>' + value + '</i>');
 					break;
 				case 'text':
@@ -91,6 +103,14 @@ console.log('asdfsad')
 					break;
 				case 'link':
 					element.html(this._buildLinkField(value, value));
+					break;
+				case 'degree':
+					if(value === 'f') {
+						value = 'Fahrenheit (&#x2109;)';
+					} else {
+						value = 'Celsius (&#x2103;)';
+					}
+					element.html(value);
 			}
 		}
 	},
@@ -107,13 +127,13 @@ console.log('asdfsad')
 			let value = self.AppData.get(field);
 			let type = element.data('type');
 
-			self.listenTo(self.AppData, 'change:' + field, self._updateField(field));
+			self.listenTo(self.AppData, 'change:' + field, self._updateField(element, field));
 
 			if(type === 'password') {
 				element.html(self._buildPasswordField(field));
 			}
 
-			self._updateField(field)();
+			self._updateField(element, field)();
 		});
 
 		this.usenetApps.forEach((key) => {

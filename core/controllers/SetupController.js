@@ -4,6 +4,7 @@ var path       = require('path')
 var appRoot    = path.resolve(__dirname, '../../')
   , paths      = require(appRoot + '/core/paths');
 
+
 module.exports = function SetupController (app) {
 
 	return {
@@ -14,13 +15,16 @@ module.exports = function SetupController (app) {
 		},
 
 		'index': function (req, res) {
+			var upsboard   = require(paths.core);
+
 			res.render('setup/index', {
-				host    : app.get('host'),
-				port    : app.get('port'),
-				seed    : app.get('seed'),
-				title   : 'UpsBoard Setup Guide',
-				uuid    : app.get('clientId'),
-				webRoot : app.get('webRoot') == '/' ? '' : app.get('webRoot')
+				host     : app.get('host'),
+				port     : app.get('port'),
+				os       : upsboard.os ? "'" + upsboard.os + "'" : false,
+				seed     : app.get('seed'),
+				title    : 'UpsBoard Setup Guide',
+				uuid     : app.get('clientId'),
+				webRoot  : app.get('webRoot') == '/' ? '' : app.get('webRoot')
 			});
 		}
 	}

@@ -15,6 +15,11 @@ export default function ServerSchema(self) {
 			}
 		},
 
+		'os': {
+			default: 'linux',
+			isButtonGroup: true
+		},
+
 		'host': {
 			el: '#addServerHost',
 			preRequirement: isRemote,

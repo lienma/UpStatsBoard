@@ -51,6 +51,18 @@ form.form-horizontal
               button(type='button', aria-label='No', data-model='appRequireLogin', data-value='false').btn.btn-default.col-md-3.btn-switch No
           span.help-block#appAutoUpdateHelp Disable if you want user's to be logged in.
 
+  .row
+    .col-md-12
+      h4.step-title Database Settings
+      .form-group
+        label(for='appdbLocation').col-sm-2.control-label Database Location
+        .col-sm-8
+          .row
+            .btn-group(role='group').btn-group-sm.col-md-12
+              button(type='button', aria-label='Yes', data-model='appdbLocation', data-value='file').btn.btn-default.col-md-3.btn-switch.active File Database
+              button(type='button', aria-label='No', data-model='appdbLocation', data-value='server').btn.btn-default.col-md-3.btn-switch MySQL Server
+          span.help-block#appdbLocationHelp database
+
 
   .row
     .col-md-12

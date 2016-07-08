@@ -46,7 +46,7 @@ module.exports = function SetupServerController (app) {
 	return {
 		'drive': function (req, res) {
 			var data = { };
-			_.each(['remote', 'host', 'port', 'username', 'authentication', 'password', 'privateKey', 'passphrase'], function (key) {
+			_.each(['os', 'remote', 'host', 'port', 'username', 'authentication', 'password', 'privateKey', 'passphrase'], function (key) {
 				var value = req.body[key] ? req.body[key] : '';
 
 				if(value === 'true') value = true;
@@ -68,7 +68,7 @@ module.exports = function SetupServerController (app) {
 
 		'test': function (req, res) {
 			var data = { remote: true };
-			_.each(['host', 'port', 'username', 'authentication', 'password', 'privateKey', 'passphrase'], function (key) {
+			_.each(['os', 'host', 'port', 'username', 'authentication', 'password', 'privateKey', 'passphrase'], function (key) {
 				data[key] = req.body[key] ? req.body[key] : '';
 			});
 

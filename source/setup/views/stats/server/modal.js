@@ -1,7 +1,7 @@
 import _               from 'underscore';
 import Backbone        from 'backbone';
 import Notify          from '../../../utils/notify';
-import TmplServerModal from '../../../templates/modal-server.jade';
+import TmplServerModal from '../../../templates/modals/server.jade';
 import ServerModel     from '../../../models/server';
 import ServerSchema    from './schema';
 import DropdownView    from '../../dropdown';
@@ -38,7 +38,7 @@ class ServerModalView extends Backbone.View {
 		this.viewBandwidthMaxUpload = new DropdownView(speedUnits, { size: 'sm' });
 		this.viewBandwidthMaxDownload = new DropdownView(speedUnits, { size: 'sm' });
 
-		this.listenTo(this.model, 'change:remote', this.updateModelRemote);
+		this.listenTo(this.model, 'change:os', this.updateOS);
 		this.listenTo(this.model, 'change:authentication', this.updateModelAuthentication);
 		this.listenTo(this.model, 'change:monitorBandwidth', this.toggleBandwidth);
 		this.listenTo(this.model.drives, 'update', this.updateDrivesTable);
@@ -121,8 +121,13 @@ class ServerModalView extends Backbone.View {
 	clickSwitch(e) {
 		e.preventDefault();
 
-		let target = $(e.target)
-		  , model = target.data('model')
+		let target = $(e.target);
+
+		if(target.data('model') === undefined) {
+			target = target.parents('[data-model]');
+		}
+
+		let model = target.data('model')
 		  , value = target.data('value');
 
 		target.blur();
@@ -342,6 +347,18 @@ class ServerModalView extends Backbone.View {
 			closeOthers(() => formPrivateKey.slideDown() );
 		} else {
 			closeOthers();
+		}
+	}
+
+	updateOS() {
+		this.model.set('authentication', 'password');
+		this.setSwitchBtn('authentication', 'password');
+
+		let btnPrivateKey = this.$('.btn-private-key-authen');
+		if(this.model.get('os') === 'windows') {
+			btnPrivateKey.prop('disabled', true);
+		} else {
+			btnPrivateKey.prop('disabled', false);
 		}
 	}
 

@@ -12,6 +12,7 @@ class ServerModel extends Backbone.Model {
 	get defaults() {
 		return {
 			'label': '',
+			'os': 'linux',
 			'remote': false,
 			'host': '',
 			'port': '',
@@ -67,7 +68,7 @@ class ServerModel extends Backbone.Model {
 	}
 
 	get serverLogin() {
-		return _.pick(this.attributes, 'remote', 'host', 'port', 'username', 'authentication', 'password', 'privateKey', 'passphrase');
+		return _.pick(this.attributes, 'os', 'remote', 'host', 'port', 'username', 'authentication', 'password', 'privateKey', 'passphrase');
 	}
 }
 

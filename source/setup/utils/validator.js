@@ -4,7 +4,7 @@ import Backbone from 'backbone';
 class Validator {
 	constructor(options = {}) {
 		_.extend(this, Backbone.Events);
-		_.defaults(options, { body: '', dataSchema: {}, displayFormValidation: false});
+		_.defaults(options, { body: '', dataSchema: {}, displayFormValidation: false });
 
 		this.body = $(options.body);
 		this.is = ValidatorMethods;
@@ -83,7 +83,14 @@ class Validator {
 
 	getElement(id) {
 		let data = this.dataSchema[id];
-		let element = (data.el !== undefined) ? data.el : '#' + id;
+		let element;
+
+		if(data.isButtonGroup && !data.el) {
+			element = '[data-model="' + id + '"]';
+		} else {
+			element = (data.el) ? data.el : '#' + id;
+		}
+
 		return $(this.body.find(element));
 	}
 
@@ -95,7 +102,6 @@ class Validator {
 			element.each(function() {
 				if($(this).hasClass('active')) {
 					value = $(this).data('value');
-
 				}
 			});
 		} else {
@@ -118,15 +124,24 @@ class Validator {
 	};
 
 	setDataSchema(dataSchema) {
+		const newDataSchema = {};
 		_.each(dataSchema, (data, id) => {
+
+			_.defaults(data, {
+				default: '',
+				isButtonGroup: false,
+				el: false
+			});
+
 			this._fieldIsvalid[id] = false;
 			this.bindToElement(data, id);
 
-			var defaultValue = (data.default) ? data.default : '';
-			this.trigger('update', id, defaultValue, true);
+			this.trigger('update', id, data.default, true);
+
+			newDataSchema[id] = data;
 		});
 
-		this.dataSchema = dataSchema;
+		this.dataSchema = newDataSchema;
 	}
 
 	setDefaults(defaultData) {
@@ -269,10 +284,10 @@ throw new Error('ID not found')
 						warningMessage = msg(constraint);
 					}
 				});
-				trigger('warning:' + id, hasWarning);
 			} else {
-				trigger('warning:' + id, false);
+				hasWarning = false;
 			}
+			trigger('warning:' + id, hasWarning);
 		}
 
 		if(hasError) {

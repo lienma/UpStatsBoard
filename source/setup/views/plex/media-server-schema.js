@@ -15,7 +15,8 @@ const schema = {
 	},
 
 	'plexMediaServerSSLEnable': {
-		default: false
+		default: false,
+		isButtonGroup: true
 	},
 
 	'plexDefaultMovie': {
@@ -39,7 +40,8 @@ const schema = {
 	},
 
 	'plexMediaServerUseBIF': {
-		default: false
+		default: false,
+		isButtonGroup: true
 	}
 };
 

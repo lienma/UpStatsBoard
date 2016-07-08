@@ -8,7 +8,7 @@ $(() => {
 
     app.setData({
     	'settings': {
-            'appBindAddress': 'usenet.server',
+            'appBindAddress': '127.0.0.1',
             'appPortNumber': 18024,
     		'appRequireLogin': false,
 
@@ -22,31 +22,35 @@ $(() => {
     			'enabled': true,
     			'host': 'usenet.server',
     			'port': 10001,
-    			'apiKey': 'aa',
-    			'useSSL': true
+    			'apiKey': 'aa-sabnzbd',
+    			'useSSL': true,
+                'webRoot': '/sabnzbd'
     		},
 
     		'sonarr': {
     			'enabled': true,
     			'host': 'usenet.server',
     			'port': 10002,
-    			'apiKey': 'aa',
-    			'useSSL': true
+    			'apiKey': 'aa-sonarr',
+    			'useSSL': true,
+                'webRoot': '/sonarr'
     		},
 
             'couchpotato': {
                 'enabled': true,
                 'host': 'usenet.server',
                 'port': 10003,
-                'apiKey': 'aa',
-                'useSSL': true
+                'apiKey': 'aa-couchpotato',
+                'useSSL': true,
+                'webRoot': '/couchpotato'
             },
             'headphones': {
                 'enabled': true,
                 'host': 'usenet.server',
                 'port': 10004,
-                'apiKey': 'aa',
-                'useSSL': true
+                'apiKey': 'aa-headphones',
+                'useSSL': true,
+                'webRoot': '/headphones'
             },
     	},
     	'plex': {
@@ -94,5 +98,5 @@ $(() => {
     });
 
     app.render();
-    app.open('overview');
+    app.open('settings');
 });

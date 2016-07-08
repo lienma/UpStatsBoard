@@ -69,6 +69,28 @@ class ServerItemView extends Backbone.View {
 		}
 
 		this.$('.btn-tooltip').tooltip({ container: 'body' });
+		this.renderOS();
+	}
+
+	renderOS() {
+		let icon = '', text = '';
+		switch(this.model.get('os')) {
+			case 'linux':
+				icon = 'linux';
+				text = 'Linux';
+				break;
+			case 'mac':
+				icon = 'apple';
+				text = 'Mac';
+				break;
+		}
+
+		var i = $('<i />').addClass('fa fa-' + icon);
+		i.tooltip({
+			container: 'body',
+			title: text
+		});
+		this.$('.os-icon').html(i);
 	}
 }
 

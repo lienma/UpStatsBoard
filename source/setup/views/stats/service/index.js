@@ -70,6 +70,7 @@ class ServicesView extends SubTabView {
 	validate() {
 		const isValid = this.collection.length !== 0;
 		this.toggleError('services', 'Require at least one service to monitor.', !isValid);
+		this.model.tab.updateTabClass(isValid);
 		return isValid;
 	}
 }

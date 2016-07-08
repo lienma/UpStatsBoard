@@ -9,7 +9,7 @@
           .ov-item(data-type='text', data-field='appBindAddress')
         .ov-row
           .ov-label Binding Port:
-          .ov-item(data-type='boolean', data-field='appPortNumber')
+          .ov-item(data-type='number', data-field='appPortNumber')
         .ov-row
           .ov-label Web Root:
           .ov-item(data-type='text', data-field='appWebRoot')
@@ -26,7 +26,7 @@
           .ov-label Require Login:
           .ov-item(data-type='enabled', data-field='appRequireLogin')
 
-    .panel.panel-default.no-bottom-margin
+    .panel.panel-default
       .panel-heading
         h4.panel-title.panel-title-small Plex.tv Account Information
       .panel-body.overview-table
@@ -37,6 +37,43 @@
           .ov-label Password:
           .ov-item(data-type='password', data-field='plexTvPassword')
 
+    .panel.panel-default
+      .panel-heading
+        h4.panel-title.panel-title-small Plex Media Server
+      .panel-body.overview-table
+        .ov-row
+          .ov-label Host Address:
+          .ov-item(data-type='text', data-field='plexMediaServerHost')
+        .ov-row
+          .ov-label Port Number:
+          .ov-item(data-type='number', data-field='plexMediaServerPortNumber')
+        .ov-row
+          .ov-label Use SSL Connection:
+          .ov-item(data-type='enabled', data-field='plexMediaServerSSLEnable')
+        .ov-row
+          .ov-label Use BIF For Previews:
+          .ov-item(data-type='enabled', data-field='plexMediaServerUseBIF')
+        .ov-row
+          .ov-label Default Movie Library:
+          .ov-item(data-type='number', data-field='plexDefaultMovie', data-empty='No Library Selected')
+        .ov-row
+          .ov-label Default TV Show Library:
+          .ov-item(data-type='number', data-field='plexDefaultTVShow', data-empty='No Library Selected')
+        .ov-row
+          .ov-label Default Music Library:
+          .ov-item(data-type='number', data-field='plexDefaultMusic', data-empty='No Library Selected')
+
+    .panel.panel-default
+      .panel-heading
+        h4.panel-title.panel-title-small PlexPy App Settings
+      .panel-body.overview-table
+        .ov-row
+          .ov-label Enabled
+          .ov-item(data-type='enabled', data-field='plexPyEnabled')
+          .ov-label Address:
+          .ov-item(data-type='link', data-field='func', data-app='plexpy')
+          .ov-label API Key:
+          .ov-item(data-type='apiKey', data-field='plexPyApiKey')
 
   .col-md-6
     .panel.panel-default
@@ -53,7 +90,7 @@
           .ov-label Password:
           .ov-item(data-type='password', data-field='appAdminPassword')
 
-    .panel.panel-default.no-bottom-margin
+    .panel.panel-default
       .panel-heading
         h4.panel-title.panel-title-small Enabled Usenet Apps
       .panel-body
@@ -113,4 +150,15 @@
             .ov-row
               .ov-label API Key:
               .ov-item(data-type='apiKey', data-field='usenet.headphones.apiKey')
+
+    .panel.panel-default.no-bottom-margin
+      .panel-heading
+        h4.panel-title.panel-title-small Weather Settings
+      .panel-body.overview-table
+        .ov-row
+          .ov-label API Key:
+          .ov-item(data-type='apiKey', data-field='forecastApiKey')
+        .ov-row
+          .ov-label Default Degree:
+          .ov-item(data-type='degree', data-field='forecastDegree')
 

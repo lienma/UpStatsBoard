@@ -84,6 +84,10 @@ class ServerView extends SubTabView {
 			this.toggleError('drives', 'Require at least one drive to be monitoring.', !hasDrives);
 		}
 
+		if(this.servers.length > 0) {
+			this.model.tab.updateTabClass(hasDrives && hasMemory && hasCpu);
+		}
+		
 		return hasDrives && hasMemory && hasCpu;
 	}
 }
